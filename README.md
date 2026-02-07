@@ -11,14 +11,18 @@ A fun quiz to discover your political shade in Thai politics.
 
 ## 🎯 Features
 
-- **8 Political Shade Categories (v2.2.3)**
+- **12 Political Shade Categories (v2.3.0)**
   - 🥊 แดงน้ำหมาก (Nam Mak) - Traditional red shirt fighters
   - 🍼 แดงนมผง (Nom Phong) - Younger analytical reds
   - 🍷 แดงมาดาม (Madam) - Elite supporters
   - ✨ แดงดารา/เซเลบ (Dara) - Celebrity influencers
-  - 🍊 ส้ม (Orange) - Progressive reformers
+  - 🍊👓 ส้มวิชาการ (Academic Orange) - Policy & structure focused
+  - 🧡🔥 ส้มแบก/ด้อม (Fandom Orange) - Passionate supporters
+  - 🎗️ เหลืองคลาสสิก (Classic Yellow) - Anti-corruption/Morality focused
+  - 👑 เหลืองสถาบัน (Royalist) - Institutional protection focused
   - 🔵 น้ำเงิน (Blue) - Pragmatic deal makers
-  - 🎗️ เหลือง (Yellow) - Traditional conservatives
+  - 🌩️ ฟ้า (Sky Blue) - Democrat/Institutionalists
+  - 🪖 เขียว (Green) - Military/Security focused
   - 🏳️ ขาว (White) - Silent majority / Neutral observers
 
 - **7 Fun Questions** exploring your political preferences
