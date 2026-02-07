@@ -1,0 +1,7 @@
+# Cloudflare Pages Redirects
+
+# Redirect index.html to root
+/index.html /
+
+# Custom 404 page (optional - falls back to index.html for SPA behavior)
+/* /index.html 404

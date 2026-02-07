@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="แบบทดสอบหาเฉดสีการเมืองไทย - คุณคือแดงเฉดไหน? แดงน้ำหมาก แดงนมผง แดงมาดาม หรือส้ม น้ำเงิน?">
+    <meta name="keywords" content="การเมืองไทย, แบบทดสอบ, แดง, ส้ม, น้ำเงิน, เกม, quiz">
+    <meta name="author" content="FindYourShade">
+    <meta property="og:title" content="คุณคือแดงเฉดไหน? - แบบทดสอบสีการเมืองไทย">
+    <meta property="og:description" content="ทำแบบทดสอบแล้วรู้ได้ว่าคุณคือสีอะไรในการเมืองไทย">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="th_TH">
+    <title>คุณคือแดงเฉดไหน? | Thai Political Shade Quiz</title>
+
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts - Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-red-100 via-orange-50 to-blue-50">
+
+    <!-- App Container -->
+    <div id="app" class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[650px] flex flex-col relative border border-gray-100">
+
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-red-600 to-red-500 p-4 text-center shadow-md relative z-10">
+            <h1 class="text-white text-xl font-bold tracking-wider drop-shadow-md">THAI POLITICAL QUIZ</h1>
+            <p class="text-red-100 text-xs mt-1">เช็คเฉดสีการเมืองในตัวคุณ</p>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content" class="flex-1 p-6 flex flex-col justify-center items-center relative overflow-y-auto">
+            <!-- Dynamic Content will be injected here -->
+        </div>
+
+        <!-- Footer -->
+        <div class="p-3 text-center text-gray-400 text-[10px] border-t bg-gray-50">
+            แบบทดสอบเพื่อความบันเทิงและการเสียดสีสังคมเท่านั้น มิได้มีเจตนาสร้างความแตกแยก
+        </div>
+    </div>
+
+    <!-- App Script -->
+    <script src="js/app.js"></script>
+</body>
+</html>
