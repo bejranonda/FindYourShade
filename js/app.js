@@ -360,7 +360,7 @@ function renderStartScreen() {
         <div class="text-center w-full fade-in font-['Kanit']">
             <div class="text-6xl mb-6 animate-bounce">⚖️</div>
             <h2 class="text-2xl font-bold text-[#003087] mb-2">เมื่อการเลือกตั้งจบลง...</h2>
-            <p class="text-gray-500 mb-8 px-4 text-sm leading-relaxed">
+            <p class="text-gray-500 mb-8 px-4 text-base leading-relaxed">
                 แต่การเมืองยังไม่จบ!<br>
                 ในวันที่ขั้วอำนาจเปลี่ยนและอุดมการณ์สั่นคลอน<br>
                 คุณยังเป็น <span class="text-red-600 font-bold">แดง</span>, <span class="text-orange-500 font-bold">ส้ม</span>, <span class="text-yellow-500 font-bold">เหลือง</span> หรือ <span class="text-blue-600 font-bold">น้ำเงิน</span> คนเดิมอยู่ไหม?<br>
@@ -392,7 +392,7 @@ function renderQuestion() {
                 <div class="progress-bar" style="width: ${progress}%"></div>
             </div>
 
-            <h3 class="text-xl font-bold text-gray-800 mb-6 leading-relaxed">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 leading-relaxed" style="font-size: 1.25rem;">
                 ${q.q}
             </h3>
 
@@ -402,7 +402,7 @@ function renderQuestion() {
     q.choices.forEach((choice, index) => {
         html += `
             <button onclick="selectChoice(${index})" class="choice-btn w-full text-left group">
-                <span class="font-medium text-base group-hover:text-[#003087] transition-colors">${choice.text}</span>
+                <span class="font-medium text-lg group-hover:text-[#003087] transition-colors">${choice.text}</span>
             </button>
         `;
     });
@@ -457,7 +457,7 @@ async function showResult() {
             </h2>
 
             <div class="result-card mb-6 w-full bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <p class="leading-relaxed text-base text-gray-700">
+                <p class="leading-relaxed text-lg text-gray-700">
                     "${result.desc}"
                 </p>
             </div>

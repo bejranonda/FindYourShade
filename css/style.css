@@ -202,14 +202,18 @@ body {
 @media (max-width: 640px) {
     .choice-btn {
         padding: 14px !important;
-        font-size: 16px !important; /* Larger text for mobile */
+        font-size: 17px !important; /* Larger text for mobile */
     }
-    
+
     h1 {
-        font-size: 18px !important;
+        font-size: 19px !important;
     }
-    
+
     .result-card {
         padding: 16px !important;
+    }
+
+    #app > div:last-child {
+        font-size: 0.875rem !important; /* text-sm for footer */
     }
 }
