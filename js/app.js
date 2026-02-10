@@ -26,19 +26,19 @@ class SoundEngine {
 
     playTone(freq, type, duration, volume = 0.1) {
         if (!this.enabled || !this.ctx) return;
-        
+
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        
+
         osc.type = type;
         osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        
+
         gain.gain.setValueAtTime(volume, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
-        
+
         osc.connect(gain);
         gain.connect(this.ctx.destination);
-        
+
         osc.start();
         osc.stop(this.ctx.currentTime + duration);
     }
@@ -358,16 +358,16 @@ function renderStartScreen() {
 
     contentDiv.innerHTML = `
         <div class="text-center w-full fade-in font-['Kanit']">
-            <div class="text-6xl mb-6 animate-bounce">🕹️</div>
-            <h2 class="text-2xl font-bold text-white mb-4 font-['Press_Start_2P'] text-[12px] leading-relaxed">SELECT PLAYER</h2>
-            <p class="text-gray-400 mb-8 px-4 leading-relaxed text-[11px]">
-                การเมืองไทย ยุค 90s อาร์เคด<br>
-                คุณคือสีอะไรในตำนาน?<br>
-                <span class="text-red-500 font-bold">แดงน้ำหมาก</span> VS <span class="text-orange-500 font-bold">ส้มแบก</span><br>
-                ฝ่าด่าน ${questions.length} คำถามเพื่อค้นหาตัวคุณ!
+            <div class="text-6xl mb-6 animate-bounce">⚖️</div>
+            <h2 class="text-2xl font-bold text-[#003087] mb-2">เมื่อการเลือกตั้งจบลง...</h2>
+            <p class="text-gray-500 mb-8 px-4 text-sm leading-relaxed">
+                แต่การเมืองยังไม่จบ!<br>
+                ในวันที่ขั้วอำนาจเปลี่ยนและอุดมการณ์สั่นคลอน<br>
+                คุณยังเป็น <span class="text-red-600 font-bold">แดง</span>, <span class="text-orange-500 font-bold">ส้ม</span>, หรือ <span class="text-blue-600 font-bold">น้ำเงิน</span> คนเดิมอยู่ไหม?<br>
+                มาเช็คจุดยืนกันใหม่ใน ${questions.length} คำถาม!
             </p>
-            <button onclick="startGame()" class="choice-btn w-full bg-red-600 text-white py-4 text-sm font-bold font-['Press_Start_2P'] blink">
-                START GAME
+            <button onclick="startGame()" class="w-full bg-[#003087] hover:bg-[#002466] text-white py-4 rounded-lg shadow-lg text-lg font-bold transition-all transform hover:scale-[1.02]">
+                เริ่มวิเคราะห์ตัวตน
             </button>
         </div>
     `;
@@ -384,22 +384,25 @@ function renderQuestion() {
 
     let html = `
         <div class="w-full h-full flex flex-col fade-in">
+            <div class="flex justify-between items-end mb-2">
+                <span class="text-sm font-bold text-[#003087]">คำถามที่ ${currentQuestionIndex + 1}</span>
+                <span class="text-xs text-gray-500">จาก ${questions.length} ข้อ</span>
+            </div>
             <div class="progress-container">
                 <div class="progress-bar" style="width: ${progress}%"></div>
             </div>
-            <div class="progress-text">STAGE ${currentQuestionIndex + 1} / ${questions.length}</div>
 
-            <h3 class="text-lg font-bold text-white mb-6 leading-relaxed font-['Kanit']">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 leading-relaxed">
                 ${q.q}
             </h3>
 
-            <div class="space-y-1 flex-1 overflow-y-auto pb-4">
+            <div class="space-y-3 flex-1 overflow-y-auto pb-4 custom-scrollbar">
     `;
 
     q.choices.forEach((choice, index) => {
         html += `
-            <button onclick="selectChoice(${index})" class="choice-btn w-full text-left p-4">
-                <span class="font-medium text-sm">${choice.text}</span>
+            <button onclick="selectChoice(${index})" class="choice-btn w-full text-left group">
+                <span class="font-medium text-base group-hover:text-[#003087] transition-colors">${choice.text}</span>
             </button>
         `;
     });
@@ -445,26 +448,28 @@ async function showResult() {
 
     contentDiv.innerHTML = `
         <div class="w-full h-full flex flex-col items-center text-center scale-in overflow-y-auto pb-8 font-['Kanit']">
-            <div class="text-[10px] font-['Press_Start_2P'] text-gray-500 mb-2">YOU ARE...</div>
+            <div class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-widest">ผลการวิเคราะห์</div>
 
-            <div class="text-7xl mb-4 animate-pulse-custom">${result.icon}</div>
+            <div class="text-8xl mb-4 filter drop-shadow-md">${result.icon}</div>
 
-            <h2 class="text-2xl font-black ${result.textClass} mb-2 uppercase italic">
+            <h2 class="text-3xl font-black ${result.textClass} mb-2 leading-tight">
                 ${result.name}
             </h2>
 
-            <div class="result-card mb-6 w-full">
-                <p class="leading-relaxed font-bold text-sm text-green-400">
+            <div class="result-card mb-6 w-full bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <p class="leading-relaxed text-base text-gray-700">
                     "${result.desc}"
                 </p>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 w-full mb-4">
-                <button onclick="renderStartScreen()" class="choice-btn text-[10px] py-2 font-['Press_Start_2P']">RETRY</button>
-                <button onclick="showStats()" class="choice-btn text-[10px] py-2 font-['Press_Start_2P']" style="border-color: #0f0">STATS</button>
+            <div class="grid grid-cols-2 gap-3 w-full mb-4">
+                <button onclick="renderStartScreen()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-bold transition-colors">
+                    🔄 เล่นอีกครั้ง
+                </button>
+                <button onclick="showStats()" class="bg-[#003087] hover:bg-[#002466] text-white py-3 rounded-lg font-bold transition-colors">
+                    📊 ดูผลโพลรวม
+                </button>
             </div>
-            
-            <div class="text-[8px] text-gray-500 font-['Press_Start_2P']">GAME OVER</div>
         </div>
     `;
 }
@@ -476,8 +481,8 @@ async function showStats() {
 
     let html = `
         <div class="w-full h-full flex flex-col fade-in font-['Kanit']">
-            <h2 class="text-[10px] font-['Press_Start_2P'] text-white mb-6 text-center">GLOBAL RANKING</h2>
-            <div class="stats-container flex-1 overflow-y-auto pr-2">
+            <h2 class="text-xl font-bold text-[#003087] mb-6 text-center">📊 ผลโพลผู้เล่นทั่วประเทศ</h2>
+            <div class="stats-container flex-1 overflow-y-auto pr-2 custom-scrollbar">
     `;
 
     const sortedCategories = Object.keys(categories).sort((a, b) => (stats[b] || 0) - (stats[a] || 0));
@@ -486,7 +491,7 @@ async function showStats() {
         const cat = categories[key];
         const count = stats[key] || 0;
         const percent = Math.round((count / total) * 100);
-        
+
         // Simple color map for stats bars
         const colorMap = {
             'bg-red-700': '#b91c1c', 'bg-pink-500': '#ec4899', 'bg-red-500': '#ef4444',
@@ -499,11 +504,13 @@ async function showStats() {
         html += `
             <div class="bar-row">
                 <div class="bar-label">
-                    <span class="text-[11px]">${cat.icon} ${cat.name}</span>
-                    <span class="text-[10px] font-['Press_Start_2P']">${percent}%</span>
+                    <span class="text-sm font-medium text-gray-700 flex items-center gap-2">
+                        <span>${cat.icon}</span> ${cat.name}
+                    </span>
+                    <span class="text-sm font-bold text-[#003087]">${percent}%</span>
                 </div>
                 <div class="bar-outer">
-                    <div class="bar-inner" style="width: ${percent}%; background-color: ${colorMap[cat.colorClass] || '#f00'}"></div>
+                    <div class="bar-inner" style="width: ${percent}%; background-color: ${colorMap[cat.colorClass] || '#999'}"></div>
                 </div>
             </div>
         `;
@@ -511,7 +518,9 @@ async function showStats() {
 
     html += `
             </div>
-            <button onclick="renderStartScreen()" class="choice-btn w-full mt-4 font-['Press_Start_2P'] text-[10px]">BACK</button>
+            <button onclick="renderStartScreen()" class="w-full mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-bold transition-colors">
+                ⬅ กลับหน้าหลัก
+            </button>
         </div>
     `;
 
@@ -525,7 +534,7 @@ async function showStats() {
 function init() {
     loadHistory();
     setupSound();
-    
+
     // Check for shared result (disabled for now or could be re-implemented)
     const urlParams = new URLSearchParams(window.location.search);
     const resultParam = urlParams.get('result');

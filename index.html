@@ -20,43 +20,45 @@
     <!-- Google Fonts - Kanit & Press Start 2P -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Press+Start+2P&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Press+Start+2P&display=swap"
         rel="stylesheet">
 
+    <!-- Custom Styles -->
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-4 bg-[#1a1a1a] arcade-bg">
-    <!-- CRT Effect Overlay -->
-    <div class="crt-overlay pointer-events-none"></div>
-    <div class="scanlines pointer-events-none"></div>
+<body class="min-h-screen flex items-center justify-center p-0 bg-[#f0f2f5] font-['Kanit']">
 
     <!-- App Container -->
     <div id="app"
-        class="w-full max-w-md bg-[#222] rounded-none shadow-[0_0_20px_rgba(255,0,0,0.3)] overflow-hidden min-h-[650px] flex flex-col relative border-4 border-[#444] arcade-window">
+        class="w-full max-w-md bg-white shadow-xl min-h-[100dvh] md:min-h-[700px] md:h-auto md:rounded-xl flex flex-col relative border border-gray-200 election-card">
 
         <!-- Header -->
-        <div class="bg-[#333] border-b-4 border-[#444] p-4 text-center relative z-10 arcade-header">
-            <h1 class="text-[#ff0000] text-sm font-['Press_Start_2P'] tracking-tighter drop-shadow-[2px_2px_0_#000]">FIND YOUR SHADE</h1>
-            <p class="text-white text-[10px] mt-2 font-['Press_Start_2P']">INSERT COIN</p>
-            
+        <div class="bg-white border-b border-gray-200 p-4 text-center relative z-10 shadow-sm">
+            <h1 class="text-[#003087] text-xl font-bold tracking-tight">การเมืองไทย: ฉบับหลังเลือกตั้ง</h1>
+            <p class="text-gray-500 text-xs mt-1">เมื่อฝุ่นจาง... คุณอยู่ตรงไหนในสมการใหม่?</p>
+
             <!-- Sound Toggle -->
-            <button id="sound-toggle" class="absolute right-4 top-1/2 -translate-y-1/2 text-white opacity-70 hover:opacity-100 transition-opacity">
+            <button id="sound-toggle"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-800 transition-colors">
                 <span id="sound-icon">🔊</span>
             </button>
         </div>
 
         <!-- Content Area -->
-        <div id="content" class="flex-1 p-6 flex flex-col justify-center items-center relative overflow-y-auto z-10">
+        <div id="content"
+            class="flex-1 p-6 flex flex-col justify-center items-center relative overflow-y-auto z-10 bg-[#f8f9fa]">
             <!-- Dynamic Content will be injected here -->
         </div>
 
         <!-- Footer -->
-        <div class="p-3 text-center text-[#666] text-[10px] border-t-4 border-[#444] bg-[#222] z-10 font-['Press_Start_2P']">
-            <div class="mb-1">© 199X RETRO ARCADE SYSTEM</div>
-            <div class="font-medium opacity-75">v3.0.0-RETRO</div>
-            <button onclick="showStats()" class="mt-2 text-[#ff0000] hover:underline cursor-pointer">GLOBAL STATS</button>
+        <div class="p-4 text-center text-gray-400 text-xs border-t border-gray-200 bg-white z-10">
+            <div class="mb-1">© 202X Thai Political Compass</div>
+            <div class="font-light opacity-75">v3.0.0-ELECTION</div>
+            <button onclick="showStats()"
+                class="mt-2 text-[#003087] font-medium hover:underline cursor-pointer">ดูผลโพลทั่วประเทศ</button>
         </div>
     </div>
 
