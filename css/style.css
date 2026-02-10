@@ -241,4 +241,19 @@ body {
 }
 
 /* Confetti Animation */
-/* Now using canvas-confetti library for spectacular side-shooting effects */
+/* Canvas-confetti for side-shooting + Emoji rain from top */
+
+@keyframes emojiFall {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(50vh) rotate(180deg) scale(1.1);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg) scale(0.8);
+        opacity: 0;
+    }
+}

@@ -127,7 +127,7 @@ const categories = {
         id: 'NAM_MAK',
         name: { th: 'แดงน้ำหมาก', en: 'Red (Traditionalist)' },
         icon: '🥊',
-        confettiEmoji: '❤️',
+        confettiEmoji: ['🥊', '❤️', '🌿'],
         colorClass: 'bg-red-700',
         textClass: 'text-red-500',
         desc: {
@@ -139,7 +139,7 @@ const categories = {
         id: 'NOM_PHONG',
         name: { th: 'แดงนมผง', en: 'Red (New Gen)' },
         icon: '🍼',
-        confettiEmoji: '❤️',
+        confettiEmoji: ['🍼', '❤️', '📱'],
         colorClass: 'bg-pink-500',
         textClass: 'text-pink-400',
         desc: {
@@ -151,7 +151,7 @@ const categories = {
         id: 'MADAM',
         name: { th: 'แดงมาดาม', en: 'Red (Elite/Madam)' },
         icon: '🍷',
-        confettiEmoji: '❤️',
+        confettiEmoji: ['🍷', '❤️', '👠', '👜'],
         colorClass: 'bg-red-500',
         textClass: 'text-red-400',
         desc: {
@@ -163,7 +163,7 @@ const categories = {
         id: 'DARA',
         name: { th: 'แดงดารา/เซเลบ', en: 'Red (Celeb)' },
         icon: '✨',
-        confettiEmoji: '✨',
+        confettiEmoji: ['✨', '⭐', '🎤', '❤️'],
         colorClass: 'bg-purple-600',
         textClass: 'text-purple-400',
         desc: {
@@ -175,7 +175,7 @@ const categories = {
         id: 'ORANGE',
         name: { th: 'ส้ม (แอบเนียน)', en: 'Orange (Closeted)' },
         icon: '🍊',
-        confettiEmoji: '🍊',
+        confettiEmoji: ['🍊', '🍊', '💡', '📚'],
         colorClass: 'bg-orange-500',
         textClass: 'text-orange-400',
         desc: {
@@ -187,7 +187,7 @@ const categories = {
         id: 'BLUE',
         name: { th: 'น้ำเงิน (สายดีล)', en: 'Blue (The Deal Maker)' },
         icon: '🔵',
-        confettiEmoji: '🌿',
+        confettiEmoji: ['🌿', '🌿', '💰', '🤝'],
         colorClass: 'bg-blue-600',
         textClass: 'text-blue-500',
         desc: {
@@ -199,7 +199,7 @@ const categories = {
         id: 'SKY_BLUE',
         name: { th: 'ฟ้า (ประชาธิปัตย์)', en: 'Sky Blue (Democrat)' },
         icon: '🌩️',
-        confettiEmoji: '💧',
+        confettiEmoji: ['💧', '💧', '🕊️', '☔'],
         colorClass: 'bg-sky-400',
         textClass: 'text-sky-500',
         desc: {
@@ -211,7 +211,7 @@ const categories = {
         id: 'ORANGE_ACADEMIC',
         name: { th: 'ส้มวิชาการ', en: 'Orange (Academic)' },
         icon: '🍊👓',
-        confettiEmoji: '🍊',
+        confettiEmoji: ['📚', '💡', '👓', '🍊'],
         colorClass: 'bg-orange-400',
         textClass: 'text-orange-300',
         desc: {
@@ -223,7 +223,7 @@ const categories = {
         id: 'ORANGE_FAN',
         name: { th: 'ส้มแบก/ด้อม', en: 'Orange (Supporter)' },
         icon: '🧡🔥',
-        confettiEmoji: '🍊',
+        confettiEmoji: ['🔥', '🧡', '📣', '🍊'],
         colorClass: 'bg-orange-600',
         textClass: 'text-orange-500',
         desc: {
@@ -235,7 +235,7 @@ const categories = {
         id: 'YELLOW_CLASSIC',
         name: { th: 'เหลืองคลาสสิก (คนดี)', en: 'Yellow (Classic)' },
         icon: '🎗️',
-        confettiEmoji: '🎗️',
+        confettiEmoji: ['🎗️', '💛', '🎗️', '🥚'],
         colorClass: 'bg-yellow-400',
         textClass: 'text-yellow-400',
         desc: {
@@ -247,7 +247,7 @@ const categories = {
         id: 'YELLOW_ROYALIST',
         name: { th: 'เหลืองสถาบัน', en: 'Yellow (Royalist)' },
         icon: '👑',
-        confettiEmoji: '👑',
+        confettiEmoji: ['👑', '💛', '🏛️', '🌹'],
         colorClass: 'bg-yellow-600',
         textClass: 'text-yellow-500',
         desc: {
@@ -259,7 +259,7 @@ const categories = {
         id: 'GREEN',
         name: { th: 'เขียว (ลายพราง)', en: 'Green (Military)' },
         icon: '🪖',
-        confettiEmoji: '🪖',
+        confettiEmoji: ['🪖', '🛡️', '⭐', '🎖️'],
         colorClass: 'bg-green-700',
         textClass: 'text-green-500',
         desc: {
@@ -271,7 +271,7 @@ const categories = {
         id: 'WHITE',
         name: { th: 'ขาว (พลังเงียบ)', en: 'White (Silent Power)' },
         icon: '🏳️',
-        confettiEmoji: '☕',
+        confettiEmoji: ['☕', '🏳️', '🕊️', '🍚'],
         colorClass: 'bg-gray-400',
         textClass: 'text-gray-400',
         desc: {
@@ -541,67 +541,100 @@ function updateStaticText() {
 // Visual Effects
 // ============================================
 
-function startConfetti(emoji) {
-    // Check if canvas-confetti library is loaded
-    if (typeof confetti !== 'function') {
-        console.warn('canvas-confetti library not loaded');
-        return;
+function startConfetti(emojis) {
+    const container = document.getElementById('app');
+    if (!container) return;
+
+    // Normalize emojis to array
+    const emojiArray = Array.isArray(emojis) ? emojis : [emojis || '✨'];
+
+    // 1. Spectacular side-shooting confetti with colors
+    if (typeof confetti === 'function') {
+        const duration = 4000; // 4 seconds of celebration
+        const end = Date.now() + duration;
+
+        // Political shade colors (red, orange, yellow, blue, green, white)
+        const colors = [
+            '#ef4444', // Red
+            '#f97316', // Orange
+            '#eab308', // Yellow
+            '#3b82f6', // Blue
+            '#22c55e', // Green
+            '#ffffff'  // White
+        ];
+
+        (function frame() {
+            // Left side blast - shooting right
+            confetti({
+                particleCount: 12,
+                angle: 60,
+                spread: 70,
+                origin: { x: 0, y: 0.6 },
+                colors: colors,
+                scalar: 1.3,
+                drift: 0.5,
+                gravity: 0.8
+            });
+
+            // Right side blast - shooting left
+            confetti({
+                particleCount: 12,
+                angle: 120,
+                spread: 70,
+                origin: { x: 1, y: 0.6 },
+                colors: colors,
+                scalar: 1.3,
+                drift: -0.5,
+                gravity: 0.8
+            });
+
+            // Extra burst from center for more impact
+            confetti({
+                particleCount: 8,
+                angle: 90,
+                spread: 100,
+                origin: { x: 0.5, y: 0.7 },
+                colors: colors,
+                scalar: 1.5,
+                drift: 0,
+                gravity: 1
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
     }
 
-    const duration = 4000; // 4 seconds of celebration
-    const end = Date.now() + duration;
+    // 2. Category-specific emoji rain from top
+    const emojiCount = 60; // Lots of emojis!
 
-    // Political shade colors (red, orange, yellow, blue, green, white)
-    const colors = [
-        '#ef4444', // Red
-        '#f97316', // Orange
-        '#eab308', // Yellow
-        '#3b82f6', // Blue
-        '#22c55e', // Green
-        '#ffffff'  // White
-    ];
+    for (let i = 0; i < emojiCount; i++) {
+        setTimeout(() => {
+            const span = document.createElement('span');
+            const randomEmoji = emojiArray[Math.floor(Math.random() * emojiArray.length)];
 
-    (function frame() {
-        // Left side blast - shooting right
-        confetti({
-            particleCount: 12,
-            angle: 60,
-            spread: 70,
-            origin: { x: 0, y: 0.6 },
-            colors: colors,
-            scalar: 1.3,
-            drift: 0.5,
-            gravity: 0.8
-        });
+            span.textContent = randomEmoji;
+            span.className = 'emoji-confetti';
+            span.style.cssText = `
+                position: absolute;
+                top: -50px;
+                left: ${Math.random() * 100}%;
+                font-size: ${1.5 + Math.random() * 1.5}rem;
+                pointer-events: none;
+                z-index: 1000;
+                animation: emojiFall ${2 + Math.random() * 2}s linear forwards;
+                opacity: 0.9;
+            `;
 
-        // Right side blast - shooting left
-        confetti({
-            particleCount: 12,
-            angle: 120,
-            spread: 70,
-            origin: { x: 1, y: 0.6 },
-            colors: colors,
-            scalar: 1.3,
-            drift: -0.5,
-            gravity: 0.8
-        });
+            container.appendChild(span);
 
-        // Extra burst from center for more impact
-        confetti({
-            particleCount: 8,
-            angle: 90,
-            spread: 100,
-            origin: { x: 0.5, y: 0.7 },
-            colors: colors,
-            scalar: 1.5,
-            drift: 0,
-            gravity: 1
-        });
-
-        if (Date.now() < end) {
-            requestAnimationFrame(frame);
-        }
-    }());
+            // Remove after animation
+            setTimeout(() => {
+                span.remove();
+            }, 5000);
+        }, i * 50); // Stagger the emojis for continuous rain
+    }
 }
 
 // ============================================
