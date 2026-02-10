@@ -278,26 +278,55 @@ let quizHistory = [];
 let answerHistory = []; // Track answers for back functionality
 
 // ============================================
-// Database (Cloudflare Worker Mock)
+// Database (Cloudflare D1)
 // ============================================
 
 async function saveResultToDatabase(category) {
     console.log("Saving result to Cloudflare:", category.id);
     try {
-        // Mocking global stats in localStorage
+        // Save to D1 database via Pages Function
+        const response = await fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: category.id })
+        });
+
+        if (response.ok) {
+            console.log("Successfully saved to database");
+        } else {
+            console.warn("Failed to save to database, using localStorage fallback");
+            // Fallback to localStorage if API fails
+            const stats = JSON.parse(localStorage.getItem('globalStats') || '{}');
+            stats[category.id] = (stats[category.id] || 0) + 1;
+            localStorage.setItem('globalStats', JSON.stringify(stats));
+        }
+    } catch (e) {
+        console.error("Failed to save result", e);
+        // Fallback to localStorage on error
         const stats = JSON.parse(localStorage.getItem('globalStats') || '{}');
         stats[category.id] = (stats[category.id] || 0) + 1;
         localStorage.setItem('globalStats', JSON.stringify(stats));
-
-        // In a real scenario, you'd do:
-        // await fetch('https://your-worker.workers.dev/api/save', { method: 'POST', body: JSON.stringify({id: category.id}) });
-    } catch (e) {
-        console.error("Failed to save result", e);
     }
 }
 
 async function getGlobalStats() {
-    return JSON.parse(localStorage.getItem('globalStats') || '{}');
+    try {
+        // Get stats from D1 database via Pages Function
+        const response = await fetch('/api/stats');
+        if (response.ok) {
+            const stats = await response.json();
+            // Merge with localStorage for any unsaved local results
+            const localStats = JSON.parse(localStorage.getItem('globalStats') || '{}');
+            return { ...stats, ...localStats };
+        } else {
+            // Fallback to localStorage if API fails
+            return JSON.parse(localStorage.getItem('globalStats') || '{}');
+        }
+    } catch (e) {
+        console.error("Failed to fetch stats", e);
+        // Fallback to localStorage on error
+        return JSON.parse(localStorage.getItem('globalStats') || '{}');
+    }
 }
 
 // ============================================

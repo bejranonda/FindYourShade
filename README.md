@@ -1,7 +1,7 @@
 # คุณคือแดงเฉดไหน? - Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.3.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.5.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
 A fun, interactive quiz to discover your political shade in Thai politics.
@@ -19,13 +19,15 @@ A fun, interactive quiz to discover your political shade in Thai politics.
 - **Immersive Gameplay**
   - **8-bit Sound System:** Procedural sound effects (Beep, Select, Win) generated via Web Audio API
   - **Progress Tracking:** Visual progress bar as you navigate through 7 questions
-  - **Global Stats:** Real-time ranking of results (persisted locally)
+  - **Global Stats:** Real-time ranking of results persisted in Cloudflare D1 database
+  - **Back Navigation:** Go back and change your answers at any time
   - **Responsive Design:** Works seamlessly on mobile and desktop
 
 - **Production Ready**
   - **Tailwind CSS v3:** Properly bundled for production (no CDN dependencies)
-  - **Optimized Assets:** Minified CSS for fast loading
-  - **Static Hosting:** Deployed on Cloudflare Pages
+  - **Cloudflare D1:** Serverless database for global stats
+  - **Pages Functions:** Serverless API endpoints
+  - **Cache-Busting:** Versioned assets for fresh deployments
 
 ## 🚀 Live Demo
 
@@ -67,10 +69,29 @@ The site is automatically deployed from the `master` branch. Build settings:
 - **Build output directory:** `/`
 - **Node.js version:** `18` or newer
 
-Or deploy manually:
+## 🗄️ Setting up Cloudflare D1 Database (Optional)
+
+For global stats to work across all users, set up Cloudflare D1:
+
+1. **Create D1 Database:**
 ```bash
-npx wrangler pages deploy . --project-name=find-your-shade
+wrangler d1 create DB --name=findyourshade-db
 ```
+
+2. **Run the schema:**
+```bash
+wrangler d1 execute findyourshade-db --file=schema.sql
+```
+
+3. **Update `wrangler.toml`** with your database ID:
+```toml
+[[d1_databases]]
+binding = "DB"
+database_name = "findyourshade-db"
+database_id = "your-database-id-here"  # Replace with actual ID
+```
+
+4. **Deploy to activate the bindings**
 
 ## 🛠️ Tech Stack
 
@@ -79,9 +100,10 @@ npx wrangler pages deploy . --project-name=find-your-shade
 | **HTML5** | Core structure |
 | **Vanilla JS** | Quiz logic and state management |
 | **Tailwind CSS v3** | Utility-first CSS framework |
-| **Web Audio API** | 8-bit sound effects (no external files) |
-| **Google Fonts** | Kanit (Thai) & Press Start 2P (Arcade) |
-| **Cloudflare Pages** | Static hosting and CDN |
+| **Cloudflare D1** | Serverless SQLite database |
+| **Cloudflare Pages Functions** | Serverless API endpoints |
+| **Web Audio API** | 8-bit sound effects |
+| **Google Fonts** | Kanit (Thai) & Press Start 2P |
 
 ## 📁 Project Structure
 
@@ -94,8 +116,14 @@ FindYourShade/
 │   └── style.css       # Custom styles and animations
 ├── js/
 │   └── app.js          # Quiz logic, sound engine, stats
+├── functions/
+│   └── api/
+│       ├── save.js     # Pages Function - Save result to D1
+│       └── stats.js    # Pages Function - Get stats from D1
+├── schema.sql          # D1 database schema
 ├── package.json        # Dependencies and build scripts
 ├── tailwind.config.js  # Tailwind configuration
+├── wrangler.toml      # Cloudflare configuration
 ├── _headers            # Cloudflare Pages headers
 ├── _redirects          # Cloudflare Pages redirects
 └── README.md
@@ -110,21 +138,30 @@ FindYourShade/
 
 ## 📝 Changelog
 
+### v3.5.0 (2025-02-10)
+- **Added:** Cloudflare D1 database for true global stats
+- **Added:** Pages Functions (`/api/save`, `/api/stats`)
+- **Added:** Back button to review and change previous answers
+- **Added:** Cache-busting query parameters for asset freshness
+- **Improved:** Fallback to localStorage if API unavailable
+
+### v3.4.0 (2025-02-10)
+- **Added:** Back button navigation for answer review
+- **Improved:** Answer history tracking with score recalculation
+
 ### v3.3.0 (2025-02-10)
 - **Added:** wrangler.toml for Cloudflare Pages configuration
 - **Added:** MIT License for open source compliance
-- **Improved:** Documentation with comprehensive deployment guides
-- **Infrastructure:** GitHub connected to Cloudflare Pages with auto-deploy
+- **Infrastructure:** GitHub connected to Cloudflare Pages
 
 ### v3.2.0 (2025-02-10)
-- **Fixed:** Removed stale submodule reference causing Cloudflare build failures
-- **Added:** Production-ready Tailwind CSS build process (no more CDN warnings)
-- **Added:** package.json with build scripts for CSS compilation
-- **Improved:** Static asset optimization for faster loading
+- **Fixed:** Removed stale submodule reference
+- **Added:** Production-ready Tailwind CSS build process
+- **Added:** package.json with build scripts
 
 ### v3.1.0
 - **Added:** Global stats display
-- **Updated:** Category descriptions for more balanced tone
+- **Updated:** Category descriptions for balanced tone
 
 ### v3.0.0-RETRO
 - Initial retro arcade-themed release

@@ -10,6 +10,14 @@ command = "npm run build:css"
 cwd = "."
 watch_paths = ["css/**", "js/**", "*.html"]
 
+# D1 Database Binding
+# Create database first: wrangler d1 create DB --name=findyourshade-db
+# Then uncomment and update with your database ID:
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "findyourshade-db"
+# database_id = "your-database-id-here"
+
 # Environment variables (optional)
 # [vars]
 # ENVIRONMENT = "production"
