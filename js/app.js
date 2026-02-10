@@ -363,8 +363,8 @@ function renderStartScreen() {
             <p class="text-gray-500 mb-8 px-4 text-sm leading-relaxed">
                 แต่การเมืองยังไม่จบ!<br>
                 ในวันที่ขั้วอำนาจเปลี่ยนและอุดมการณ์สั่นคลอน<br>
-                คุณยังเป็น <span class="text-red-600 font-bold">แดง</span>, <span class="text-orange-500 font-bold">ส้ม</span>, หรือ <span class="text-blue-600 font-bold">น้ำเงิน</span> คนเดิมอยู่ไหม?<br>
-                มาเช็คจุดยืนกันใหม่ใน ${questions.length} คำถาม!
+                คุณยังเป็น <span class="text-red-600 font-bold">แดง</span>, <span class="text-orange-500 font-bold">ส้ม</span>, <span class="text-yellow-500 font-bold">เหลือง</span> หรือ <span class="text-blue-600 font-bold">น้ำเงิน</span> คนเดิมอยู่ไหม?<br>
+                มาเช็คจุดยืนกันใหม่ใน <span class="font-bold text-[#003087] text-lg">${questions.length}</span> คำถามวัดใจ!
             </p>
             <button onclick="startGame()" class="w-full bg-[#003087] hover:bg-[#002466] text-white py-4 rounded-lg shadow-lg text-lg font-bold transition-all transform hover:scale-[1.02]">
                 เริ่มวิเคราะห์ตัวตน
