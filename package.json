@@ -1,0 +1,12 @@
+{
+  "name": "findyourshade",
+  "version": "3.2.0",
+  "description": "Thai Political Shade Quiz",
+  "scripts": {
+    "build:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}

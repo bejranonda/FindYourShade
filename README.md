@@ -1,21 +1,14 @@
-# คุณคือแดงเฉดไหน? - Retro Arcade Edition | Thai Political Shade Quiz
+# คุณคือแดงเฉดไหน? - Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.0.0--RETRO-red)](https://github.com/YOUR_USERNAME/FindYourShade)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
-**"INSERT COIN"** - แบบทดสอบหาเฉดสีการเมืองไทยในสไตล์ Retro Arcade ยุค 90s 
+A fun, interactive quiz to discover your political shade in Thai politics.
 
-A fun, 90s arcade-style quiz to discover your political shade in Thai politics.
-
-![Thai Political Quiz Arcade](https://img.shields.io/badge/Arcade-90s-red?style=for-the-badge)
+**แบบทดสอบหาเฉดสีการเมืองไทย** - มาเป็นสีอะไรกันแน่ในสมการการเมืองไทยยุคนี้?
 
 ## 🎯 Features
-
-- **Retro Arcade Experience (v3.0.0-RETRO)**
-  - **Pixel Art Aesthetics:** Complete UI overhaul inspired by classic arcade machines.
-  - **CRT/Scanline Effects:** Immersive visual overlay for that authentic retro monitor feel.
-  - **8-bit Sound System:** Procedural sound effects (Beep, Select, Win) generated via Web Audio API.
-  - **Global Stats:** Real-time ranking of results (persisted locally/simulated database).
 
 - **12 Political Shade Categories**
   - 🥊 แดงน้ำหมาก (Nam Mak) | 🍼 แดงนมผง (Nom Phong) | 🍷 แดงมาดาม (Madam)
@@ -24,13 +17,19 @@ A fun, 90s arcade-style quiz to discover your political shade in Thai politics.
   - 🌩️ ฟ้า (Sky Blue) | 🪖 เขียว (Green) | 🏳️ ขาว (Silent White)
 
 - **Immersive Gameplay**
-  - **Stage Progression:** Navigate through 7 challenging stages.
-  - **Responsive Controls:** Active button states that "click" like real arcade buttons.
-  - **Keyboard Support:** Use keys 1-8 for quick selection.
+  - **8-bit Sound System:** Procedural sound effects (Beep, Select, Win) generated via Web Audio API
+  - **Progress Tracking:** Visual progress bar as you navigate through 7 questions
+  - **Global Stats:** Real-time ranking of results (persisted locally)
+  - **Responsive Design:** Works seamlessly on mobile and desktop
+
+- **Production Ready**
+  - **Tailwind CSS v3:** Properly bundled for production (no CDN dependencies)
+  - **Optimized Assets:** Minified CSS for fast loading
+  - **Static Hosting:** Deployed on Cloudflare Pages
 
 ## 🚀 Live Demo
 
-Coming soon to Cloudflare Pages!
+**[https://findyourshade.autobahn.bot/](https://findyourshade.autobahn.bot/)**
 
 ## 📦 Installation
 
@@ -38,40 +37,91 @@ Coming soon to Cloudflare Pages!
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/FindYourShade.git
+git clone https://github.com/bejranonda/FindYourShade.git
 cd FindYourShade
 ```
 
-2. Simply open `index.html` in your browser. No build steps required.
+2. Install dependencies and build CSS:
+```bash
+npm install
+npm run build:css
+```
+
+3. Open `index.html` in your browser, or use a local server:
+```bash
+npx serve .
+```
+
+### Building for Production
+
+```bash
+npm run build:css    # Build minified Tailwind CSS
+npm run watch:css    # Watch for changes during development
+```
 
 ### Cloudflare Pages Deployment
 
-Deploy directly using Wrangler:
+The site is automatically deployed from the `master` branch. Build settings:
+
+- **Build command:** `npm run build:css`
+- **Build output directory:** `/`
+- **Node.js version:** `18` or newer
+
+Or deploy manually:
 ```bash
 npx wrangler pages deploy . --project-name=find-your-shade
 ```
 
 ## 🛠️ Tech Stack
 
-- **HTML5 & Vanilla JS** - Core logic and structure.
-- **Web Audio API** - Oscillator-based 8-bit sound effects (no external files).
-- **CSS3 (Custom)** - CRT effects, scanlines, and pixel-perfect UI.
-- **TailwindCSS** - Utility classes for layout.
-- **Google Fonts** - *Press Start 2P* (Arcade) & *Kanit* (Thai).
+| Technology | Purpose |
+|------------|---------|
+| **HTML5** | Core structure |
+| **Vanilla JS** | Quiz logic and state management |
+| **Tailwind CSS v3** | Utility-first CSS framework |
+| **Web Audio API** | 8-bit sound effects (no external files) |
+| **Google Fonts** | Kanit (Thai) & Press Start 2P (Arcade) |
+| **Cloudflare Pages** | Static hosting and CDN |
 
 ## 📁 Project Structure
 
 ```
 FindYourShade/
-├── index.html          # Main HTML (Arcade Window)
+├── index.html          # Main HTML
 ├── css/
-│   └── style.css       # CRT Effects, Retro UI, Animations
+│   ├── input.css       # Tailwind CSS entry point
+│   ├── tailwind.css    # Built Tailwind CSS (generated)
+│   └── style.css       # Custom styles and animations
 ├── js/
-│   └── app.js          # Sound Engine, Quiz Logic, Global Stats
-├── assets/
-│   └── images/         # Placeholders for future pixel art
+│   └── app.js          # Quiz logic, sound engine, stats
+├── package.json        # Dependencies and build scripts
+├── tailwind.config.js  # Tailwind configuration
+├── _headers            # Cloudflare Pages headers
+├── _redirects          # Cloudflare Pages redirects
 └── README.md
 ```
+
+## 🎮 How to Play
+
+1. Click "เริ่มวิเคราะห์ตัวตน" (Start Analysis)
+2. Answer 7 questions about your political views
+3. Discover your political shade!
+4. Share your result with friends
+
+## 📝 Changelog
+
+### v3.2.0 (2025-02-10)
+- **Fixed:** Removed stale submodule reference causing Cloudflare build failures
+- **Added:** Production-ready Tailwind CSS build process (no more CDN warnings)
+- **Added:** package.json with build scripts for CSS compilation
+- **Improved:** Static asset optimization for faster loading
+
+### v3.1.0
+- **Added:** Global stats display
+- **Updated:** Category descriptions for more balanced tone
+
+### v3.0.0-RETRO
+- Initial retro arcade-themed release
 
 ## 📝 Disclaimer
 
@@ -79,6 +129,10 @@ FindYourShade/
 
 This quiz is created for entertainment and social commentary purposes only. It is not intended to create division or promote any specific political ideology.
 
+## 📄 License
+
+MIT License - feel free to fork and modify!
+
 ---
 
-Made with 🕹️ and 🥊 for Thai politics enthusiasts
+Made with 🇹🇭 for Thai politics enthusiasts | [Powered by thalay.eu](https://thalay.eu)
