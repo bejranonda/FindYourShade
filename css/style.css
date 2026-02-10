@@ -4,7 +4,8 @@
     --election-bg: #f3f4f6;
     --election-card: #ffffff;
     --election-text: #1f2937;
-    --election-primary: #003087; /* Official looking blue */
+    --election-primary: #003087;
+    /* Official looking blue */
     --election-accent: #e11d48;
     --paper-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
@@ -43,7 +44,7 @@ body {
     width: 100% !important;
     position: relative;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;
 }
@@ -52,7 +53,7 @@ body {
     background: #f9fafb !important;
     border-color: var(--election-primary) !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .choice-btn:active {
@@ -128,7 +129,8 @@ body {
     left: 0;
     width: 100%;
     height: 6px;
-    background: linear-gradient(to right, #ef4444, #fff, #2563eb); /* Thai Flag Colors ish */
+    background: linear-gradient(to right, #ef4444, #fff, #2563eb);
+    /* Thai Flag Colors ish */
 }
 
 /* Stats Bars */
@@ -169,8 +171,15 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .animate-pulse-custom {
@@ -178,22 +187,33 @@ body {
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Scrollbar - Cleaner */
 ::-webkit-scrollbar {
     width: 6px;
 }
+
 ::-webkit-scrollbar-track {
     background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #d1d5db;
     border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
 }
@@ -202,7 +222,8 @@ body {
 @media (max-width: 640px) {
     .choice-btn {
         padding: 14px !important;
-        font-size: 17px !important; /* Larger text for mobile */
+        font-size: 17px !important;
+        /* Larger text for mobile */
     }
 
     h1 {
@@ -213,7 +234,11 @@ body {
         padding: 16px !important;
     }
 
-    #app > div:last-child {
-        font-size: 0.875rem !important; /* text-sm for footer */
+    #app>div:last-child {
+        font-size: 0.875rem !important;
+        /* text-sm for footer */
     }
 }
+
+/* Confetti Animation */
+/* Now using canvas-confetti library for spectacular side-shooting effects */

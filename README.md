@@ -1,7 +1,7 @@
 # คุณคือแดงเฉดไหน? - Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.5.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.6.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
 A fun, interactive quiz to discover your political shade in Thai politics.
@@ -17,6 +17,7 @@ A fun, interactive quiz to discover your political shade in Thai politics.
   - 🌩️ ฟ้า (Sky Blue) | 🪖 เขียว (Green) | 🏳️ ขาว (Silent White)
 
 - **Immersive Gameplay**
+  - **Spectacular Confetti:** Fireworks-like celebration with rapid side-shooting confetti in political shade colors
   - **8-bit Sound System:** Procedural sound effects (Beep, Select, Win) generated via Web Audio API
   - **Progress Tracking:** Visual progress bar as you navigate through 7 questions
   - **Global Stats:** Real-time ranking of results persisted in Cloudflare D1 database
@@ -103,6 +104,7 @@ database_id = "your-database-id-here"  # Replace with actual ID
 | **Cloudflare D1** | Serverless SQLite database |
 | **Cloudflare Pages Functions** | Serverless API endpoints |
 | **Web Audio API** | 8-bit sound effects |
+| **canvas-confetti** | Advanced particle effects |
 | **Google Fonts** | Kanit (Thai) & Press Start 2P |
 
 ## 📁 Project Structure
@@ -137,6 +139,11 @@ FindYourShade/
 4. Share your result with friends
 
 ## 📝 Changelog
+
+### v3.6.0 (2025-02-10)
+- **Added:** Spectacular fireworks-like confetti shooting from both sides
+- **Added:** canvas-confetti library for advanced particle effects
+- **Improved:** Celebration moment with rapid, colorful confetti bursts in political shade colors
 
 ### v3.5.0 (2025-02-10)
 - **Added:** Cloudflare D1 database for true global stats
