@@ -1,37 +1,32 @@
-# คุณคือแดงเฉดไหน? | Thai Political Shade Quiz
+# คุณคือแดงเฉดไหน? - Retro Arcade Edition | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-3.0.0--RETRO-red)](https://github.com/YOUR_USERNAME/FindYourShade)
 
-แบบทดสอบสนุกๆ เพื่อหาว่าคุณคือ "เฉดสี" ไหนในการเมืองไทย
+**"INSERT COIN"** - แบบทดสอบหาเฉดสีการเมืองไทยในสไตล์ Retro Arcade ยุค 90s 
 
-A fun quiz to discover your political shade in Thai politics.
+A fun, 90s arcade-style quiz to discover your political shade in Thai politics.
 
-![Thai Political Quiz](https://img.shields.io/badge/Thai-Politics-red)
+![Thai Political Quiz Arcade](https://img.shields.io/badge/Arcade-90s-red?style=for-the-badge)
 
 ## 🎯 Features
 
-- **12 Political Shade Categories (v2.3.0)**
-  - 🥊 แดงน้ำหมาก (Nam Mak) - Traditional red shirt fighters
-  - 🍼 แดงนมผง (Nom Phong) - Younger analytical reds
-  - 🍷 แดงมาดาม (Madam) - Elite supporters
-  - ✨ แดงดารา/เซเลบ (Dara) - Celebrity influencers
-  - 🍊👓 ส้มวิชาการ (Academic Orange) - Policy & structure focused
-  - 🧡🔥 ส้มแบก/ด้อม (Fandom Orange) - Passionate supporters
-  - 🎗️ เหลืองคลาสสิก (Classic Yellow) - Anti-corruption/Morality focused
-  - 👑 เหลืองสถาบัน (Royalist) - Institutional protection focused
-  - 🔵 น้ำเงิน (Blue) - Pragmatic deal makers
-  - 🌩️ ฟ้า (Sky Blue) - Democrat/Institutionalists
-  - 🪖 เขียว (Green) - Military/Security focused
-  - 🏳️ ขาว (White) - Silent majority / Neutral observers
+- **Retro Arcade Experience (v3.0.0-RETRO)**
+  - **Pixel Art Aesthetics:** Complete UI overhaul inspired by classic arcade machines.
+  - **CRT/Scanline Effects:** Immersive visual overlay for that authentic retro monitor feel.
+  - **8-bit Sound System:** Procedural sound effects (Beep, Select, Win) generated via Web Audio API.
+  - **Global Stats:** Real-time ranking of results (persisted locally/simulated database).
 
-- **7 Fun Questions** exploring your political preferences
-- **Dark Mode** support with smooth transitions
-- **Share Results** to Twitter/X, Facebook, and LINE
-- **History Tracking** - See your past quiz results
-- **Keyboard Support** - Press 1-4 to answer
-- **Responsive Design** - Works on mobile and desktop
-- **Confetti Animation** when you get your results!
+- **12 Political Shade Categories**
+  - 🥊 แดงน้ำหมาก (Nam Mak) | 🍼 แดงนมผง (Nom Phong) | 🍷 แดงมาดาม (Madam)
+  - ✨ แดงดารา (Dara) | 🍊👓 ส้มวิชาการ (Academic Orange) | 🧡🔥 ส้มแบก (Fandom Orange)
+  - 🎗️ เหลืองคลาสสิก (Classic) | 👑 เหลืองสถาบัน (Royalist) | 🔵 น้ำเงิน (Blue)
+  - 🌩️ ฟ้า (Sky Blue) | 🪖 เขียว (Green) | 🏳️ ขาว (Silent White)
+
+- **Immersive Gameplay**
+  - **Stage Progression:** Navigate through 7 challenging stages.
+  - **Responsive Controls:** Active button states that "click" like real arcade buttons.
+  - **Keyboard Support:** Use keys 1-8 for quick selection.
 
 ## 🚀 Live Demo
 
@@ -47,113 +42,36 @@ git clone https://github.com/YOUR_USERNAME/FindYourShade.git
 cd FindYourShade
 ```
 
-2. Simply open `index.html` in your browser:
-```bash
-# Using Python
-python -m http.server 8000
-
-# Or using Node.js
-npx serve
-
-# Or just open the file directly in your browser
-```
+2. Simply open `index.html` in your browser. No build steps required.
 
 ### Cloudflare Pages Deployment
 
-#### Option 1: Direct Upload
-
+Deploy directly using Wrangler:
 ```bash
-# Install Wrangler CLI
-npm install -g wrangler
-
-# Deploy to Cloudflare Pages
-wrangler pages deploy . --project-name=find-your-shade
+npx wrangler pages deploy . --project-name=find-your-shade
 ```
-
-#### Option 2: GitHub Integration
-
-1. Push your code to GitHub
-2. Go to Cloudflare Dashboard > Pages
-3. Click "Create a project" > "Connect to Git"
-4. Select your repository
-5. Configure:
-   - **Build command**: `echo "No build needed"`
-   - **Build output directory**: `/`
-   - **Root directory**: `/`
-6. Click "Save and Deploy"
 
 ## 🛠️ Tech Stack
 
-- **HTML5** - Semantic markup
-- **CSS3** - Custom animations and dark mode
-- **JavaScript (Vanilla)** - No framework dependencies
-- **TailwindCSS** - Utility-first CSS framework (via CDN)
-- **Google Fonts** - Kanit font for Thai language support
+- **HTML5 & Vanilla JS** - Core logic and structure.
+- **Web Audio API** - Oscillator-based 8-bit sound effects (no external files).
+- **CSS3 (Custom)** - CRT effects, scanlines, and pixel-perfect UI.
+- **TailwindCSS** - Utility classes for layout.
+- **Google Fonts** - *Press Start 2P* (Arcade) & *Kanit* (Thai).
 
 ## 📁 Project Structure
 
 ```
 FindYourShade/
-├── index.html          # Main HTML file
+├── index.html          # Main HTML (Arcade Window)
 ├── css/
-│   └── style.css       # Custom styles with dark mode
+│   └── style.css       # CRT Effects, Retro UI, Animations
 ├── js/
-│   └── app.js          # Quiz logic and features
+│   └── app.js          # Sound Engine, Quiz Logic, Global Stats
 ├── assets/
-│   └── images/         # Image assets
-├── _headers            # Cloudflare Pages security headers
-├── _redirects          # Cloudflare Pages redirects
-├── .gitignore
+│   └── images/         # Placeholders for future pixel art
 └── README.md
 ```
-
-## 🎨 Customization
-
-### Adding New Questions
-
-Edit `js/app.js` and add to the `questions` array:
-
-```javascript
-{
-    q: "Your question here?",
-    choices: [
-        { text: "Choice 1", score: { NAM_MAK: 3, MADAM: 1 } },
-        { text: "Choice 2", score: { NOM_PHONG: 2, ORANGE: 3 } },
-        { text: "Choice 3", score: { DARA: 3, MADAM: 1 } },
-        { text: "Choice 4", score: { BLUE: 3, MADAM: 1 } }
-    ]
-}
-```
-
-### Adding New Categories
-
-Edit `js/app.js` and add to the `categories` object:
-
-```javascript
-NEW_CATEGORY: {
-    id: 'NEW_CATEGORY',
-    name: 'Category Name',
-    icon: '🎭',
-    colorClass: 'bg-color-500',
-    textClass: 'text-color-600',
-    desc: 'Description here...'
-}
-```
-
-## 🌐 Browser Support
-
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 Disclaimer
 
@@ -161,10 +79,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This quiz is created for entertainment and social commentary purposes only. It is not intended to create division or promote any specific political ideology.
 
-## 📞 Contact
-
-- GitHub Issues: [Create an issue](https://github.com/YOUR_USERNAME/FindYourShade/issues)
-
 ---
 
-Made with ❤️ and 🥊 for Thai politics enthusiasts
+Made with 🕹️ and 🥊 for Thai politics enthusiasts

@@ -1,7 +1,71 @@
-/**
- * Thai Political Shade Quiz
- * Find your political color in Thai politics
- */
+// ============================================
+// Sound Engine (8-bit SFX using AudioContext)
+// ============================================
+
+class SoundEngine {
+    constructor() {
+        this.ctx = null;
+        this.enabled = true;
+    }
+
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    }
+
+    toggle() {
+        this.enabled = !this.enabled;
+        const icon = document.getElementById('sound-icon');
+        if (icon) icon.textContent = this.enabled ? '🔊' : '🔇';
+        return this.enabled;
+    }
+
+    playTone(freq, type, duration, volume = 0.1) {
+        if (!this.enabled || !this.ctx) return;
+        
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        
+        gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    }
+
+    playSelect() {
+        this.init();
+        this.playTone(440, 'square', 0.1);
+    }
+
+    playBeep() {
+        this.init();
+        this.playTone(880, 'square', 0.05);
+    }
+
+    playWin() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, i) => {
+            setTimeout(() => {
+                this.playTone(freq, 'square', 0.2, 0.05);
+            }, i * 150);
+        });
+    }
+}
+
+const sound = new SoundEngine();
 
 // ============================================
 // Data Definitions
@@ -13,7 +77,7 @@ const categories = {
         name: 'แดงน้ำหมาก',
         icon: '🥊',
         colorClass: 'bg-red-700',
-        textClass: 'text-red-800',
+        textClass: 'text-red-500',
         desc: 'คุณคือตำนาน! นักสู้ผู้ผ่านร้อนผ่านหนาว รักใครรักจริง เกลียดใครเกลียดเข้ากระดูกดำ พร้อมบวกทุกสถาบันเพื่ออุดมการณ์ ฟังเพลงเพื่อชีวิต และเชื่อมั่นใน "นาย" อย่างสุดหัวใจ ไม่สนใจวาทกรรมสวยหรู เน้นใจแลกใจ!'
     },
     NOM_PHONG: {
@@ -21,7 +85,7 @@ const categories = {
         name: 'แดงนมผง',
         icon: '🍼',
         colorClass: 'bg-pink-500',
-        textClass: 'text-pink-600',
+        textClass: 'text-pink-400',
         desc: 'คุณคือคนรุ่นใหม่ที่เติบโตมากับประวัติศาสตร์ เน้นวิเคราะห์โครงสร้าง ใช้เหตุผล (แต่ก็พร้อมด่ากราดในทวิตเตอร์/X) เข้าใจโลกยุคใหม่แต่ใจยังรักสีแดง แสวงหาจุดร่วม สงวนจุดต่าง พยายามจะเป็นสะพานเชื่อมรุ่น'
     },
     MADAM: {
@@ -29,7 +93,7 @@ const categories = {
         name: 'แดงมาดาม',
         icon: '🍷',
         colorClass: 'bg-red-500',
-        textClass: 'text-red-600',
+        textClass: 'text-red-400',
         desc: 'สายซัพพอร์ตเกรดพรีเมียม! ชูนิ้วในห้องแอร์ จิบไวน์ดูข่าวการเมือง ชอบความสง่างาม ไม่เน้นลงถนนให้ร้อนหน้า แต่พร้อมโอนไวถ้าใจสั่งมา เน้นความประนีประนอมแบบผู้ดี และเชื่อในการดีลที่ชาญฉลาด'
     },
     DARA: {
@@ -37,7 +101,7 @@ const categories = {
         name: 'แดงดารา/เซเลบ',
         icon: '✨',
         colorClass: 'bg-purple-600',
-        textClass: 'text-purple-600',
+        textClass: 'text-purple-400',
         desc: 'สปอตไลท์ต้องส่องที่ฉัน! การเมืองคือเวทีแฟชั่น คุณมีวาทะศิลป์เป็นเลิศ โพสต์ทีไรยอดไลก์กระจุย ชอบเป็นผู้นำเทรนด์ อินเนอร์แรง แอกติ้งเลิศ พร้อมเป็นกระบอกเสียง(ที่ดังกว่าคนอื่น) บางทีก็เน้นซีนมากกว่าเนื้อหา'
     },
     ORANGE: {
@@ -45,7 +109,7 @@ const categories = {
         name: 'ส้ม (แอบเนียน)',
         icon: '🍊',
         colorClass: 'bg-orange-500',
-        textClass: 'text-orange-500',
+        textClass: 'text-orange-400',
         desc: 'เอ๊ะ... จริงๆ คุณอาจจะไม่ใช่แดงแท้! คุณต้องการรื้อโครงสร้าง ปฏิรูปทุกสิ่งอย่าง บางทีก็หงุดหงิดกับวิธีคิดแบบเดิมๆ เน้นพุ่งชนเพดาน จนบางทีเพื่อนสีแดงก็มองค้อน คุณเชื่อในหลักการมากกว่าตัวบุคคล'
     },
     BLUE: {
@@ -53,7 +117,7 @@ const categories = {
         name: 'น้ำเงิน (สายดีล)',
         icon: '🔵',
         colorClass: 'bg-blue-600',
-        textClass: 'text-blue-700',
+        textClass: 'text-blue-500',
         desc: 'เน้นกินรวบ... เอ้ย เน้นอยู่เป็น! คุณไม่ชอบความขัดแย้งที่รุนแรง เน้นผลประโยชน์ลงตัว สบายๆ สไตล์ภูมิใจ...ในตัวเอง ใครเป็นรัฐบาลก็ได้ขอให้ฉันได้ดูแลกระทรวงเกรดเอ อุดมการณ์กินไม่ได้ แต่กัญ...เอ้ย การงานมั่นคงกินได้'
     },
     SKY_BLUE: {
@@ -61,7 +125,7 @@ const categories = {
         name: 'ฟ้า (ประชาธิปัตย์)',
         icon: '🌩️',
         colorClass: 'bg-sky-400',
-        textClass: 'text-sky-600',
+        textClass: 'text-sky-500',
         desc: 'สุภาพบุรุษนักการเมือง! คุณเชื่อมั่นในระบบรัฐสภาและกฎหมาย (แม้จะแพ้โหวตตลอด) พูดจาหลักการดูดี แต่บางทีก็ช้าไม่ทันใจวัยรุ่น เกลียดการซื้อเสียงและการโกง (แต่ก็เกลียดพวกล้มเจ้ามากกว่า) เน้นความเก๋าเกมและความเป็นสถาบันการเมือง'
     },
     ORANGE_ACADEMIC: {
@@ -69,7 +133,7 @@ const categories = {
         name: 'ส้มวิชาการ',
         icon: '🍊👓',
         colorClass: 'bg-orange-400',
-        textClass: 'text-orange-700',
+        textClass: 'text-orange-300',
         desc: 'คุณคือมันสมองของขบวนการ! เน้นข้อมูล สถิติ และโครงสร้างรัฐสวัสดิการแบบกลุ่มนอร์ดิก อธิบายเก่ง พูดจาฉะฉานด้วย Logic ล้วนๆ ไม่เน้นดราม่า แต่เน้นแก้ที่ต้นตอของปัญหาจริงๆ บางทีอาจดูเข้าถึงยากสำหรับชาวบ้าน'
     },
     ORANGE_FAN: {
@@ -85,7 +149,7 @@ const categories = {
         name: 'เหลืองคลาสสิก (คนดี)',
         icon: '🎗️',
         colorClass: 'bg-yellow-400',
-        textClass: 'text-yellow-700',
+        textClass: 'text-yellow-400',
         desc: 'เกลียดการโกงเป็นชีวิตจิตใจ! เชื่อว่า "คนดี" เท่านั้นที่ควรปกครองบ้านเมือง เกลียดนักการเมืองคอร์รัปชัน ยึดมั่นในศีลธรรม จริยธรรม และความสงบเรียบร้อย ชอบเป่านกหวีด... เอ้ย ชอบแสดงพลังต้านโกง'
     },
     YELLOW_ROYALIST: {
@@ -93,7 +157,7 @@ const categories = {
         name: 'เหลืองสถาบัน',
         icon: '👑',
         colorClass: 'bg-yellow-600',
-        textClass: 'text-yellow-900',
+        textClass: 'text-yellow-500',
         desc: 'ชาติ ศาสน์ กษัตริย์ คือลมหายใจ! คุณพร้อมปกป้องสถาบันหลักด้วยชีวิต ไม่ยอมให้ใครมาดูหมิ่น ยึดมั่นในขนบธรรมเนียมประเพณีอันดีงาม เชื่อว่ารักษาสิ่งเก่าไว้ดีที่สุดแล้ว การเปลี่ยนแปลงเร็วเกินไปคือหายนะ'
     },
     GREEN: {
@@ -101,7 +165,7 @@ const categories = {
         name: 'เขียว (ลายพราง)',
         icon: '🪖',
         colorClass: 'bg-green-700',
-        textClass: 'text-green-800',
+        textClass: 'text-green-500',
         desc: 'ความสงบจบที่ลุง! ชอบความเด็ดขาด ระเบียบวินัย และความมั่นคง มองว่านักการเมืองมีแต่สร้างปัญหา ต้องให้ทหารมาดูแลถึงจะเรียบร้อย เชื่อฟังผู้นำ ชาติพ้นภัย ไม่ชอบความวุ่นวายของการชุมนุม'
     },
     WHITE: {
@@ -109,7 +173,7 @@ const categories = {
         name: 'ขาว (พลังเงียบ)',
         icon: '🏳️',
         colorClass: 'bg-gray-400',
-        textClass: 'text-gray-600',
+        textClass: 'text-gray-400',
         desc: 'การเมืองน่าเบื่อ... ขอทำมาหากินดีกว่า! คุณไม่ได้อินกับสีไหนเป็นพิเศษ ใครเป็นรัฐบาลก็ต้องตื่นไปทำงานอยู่ดี มองว่าทุกฝ่ายก็มีทั้งคนดีและคนเลว เน้นความสงบสุขของตัวเองและครอบครัวเป็นหลัก อาจจะถูกมองว่า Ignorant แต่คุณมองว่านี่คือความสุขที่แท้จริง'
     }
 };
@@ -131,7 +195,7 @@ const questions = [
     {
         q: "เวลามีคนพูดวิจารณ์ 'ผู้นำจิตวิญญาณ' ของคุณ คุณรู้สึกยังไง?",
         choices: [
-            { text: "ยอมไม่ได้! ใครด่ามาด่ากลับไม่โกง พ่อก็คือพ่อ!", score: { ORANGE_FAN: 3, NAM_MAK: 3 } },
+            { text: "ยอมไม่ได้! ใครด่มาด่ากลับไม่โกง พ่อก็คือพ่อ!", score: { ORANGE_FAN: 3, NAM_MAK: 3 } },
             { text: "รับฟัง วิเคราะห์ด้วยเหตุผล แต่ก็เตรียมข้อมูลไปแย้งกลับแบบผู้ดี", score: { ORANGE_ACADEMIC: 3, SKY_BLUE: 2 } },
             { text: "ยิ้มอ่อน จิบชา คิดในใจว่า 'พวกเธอไม่เข้าใจเกมหรอก'", score: { MADAM: 3, BLUE: 1 } },
             { text: "โกรธมาก! พวกนี้ไม่รู้จักที่ต่ำที่สูง ต้องจับให้หมด!", score: { YELLOW_ROYALIST: 3, GREEN: 2 } },
@@ -202,22 +266,38 @@ const questions = [
 // ============================================
 
 let currentQuestionIndex = 0;
-let scores = {
-    NAM_MAK: 0,
-    NOM_PHONG: 0,
-    MADAM: 0,
-    DARA: 0,
-    BLUE: 0,
-    SKY_BLUE: 0,
-    ORANGE_ACADEMIC: 0,
-    ORANGE_FAN: 0,
-    YELLOW_CLASSIC: 0,
-    YELLOW_ROYALIST: 0,
-    GREEN: 0,
-    WHITE: 0
-};
+let scores = {};
+function resetScores() {
+    scores = {};
+    Object.keys(categories).forEach(k => scores[k] = 0);
+}
+resetScores();
+
 let currentResult = null;
 let quizHistory = [];
+
+// ============================================
+// Database (Cloudflare Worker Mock)
+// ============================================
+
+async function saveResultToDatabase(category) {
+    console.log("Saving result to Cloudflare:", category.id);
+    try {
+        // Mocking global stats in localStorage
+        const stats = JSON.parse(localStorage.getItem('globalStats') || '{}');
+        stats[category.id] = (stats[category.id] || 0) + 1;
+        localStorage.setItem('globalStats', JSON.stringify(stats));
+
+        // In a real scenario, you'd do:
+        // await fetch('https://your-worker.workers.dev/api/save', { method: 'POST', body: JSON.stringify({id: category.id}) });
+    } catch (e) {
+        console.error("Failed to save result", e);
+    }
+}
+
+async function getGlobalStats() {
+    return JSON.parse(localStorage.getItem('globalStats') || '{}');
+}
 
 // ============================================
 // DOM Elements
@@ -227,19 +307,17 @@ const contentDiv = document.getElementById('content');
 const appElement = document.getElementById('app');
 
 // ============================================
-// Dark Mode
+// Sound Initialization
 // ============================================
 
-function initDarkMode() {
-    const savedMode = localStorage.getItem('darkMode');
-    if (savedMode === 'true') {
-        document.body.classList.add('dark-mode');
+function setupSound() {
+    const btn = document.getElementById('sound-toggle');
+    if (btn) {
+        btn.onclick = () => {
+            sound.toggle();
+            sound.playBeep();
+        };
     }
-}
-
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
 }
 
 // ============================================
@@ -265,97 +343,8 @@ function saveToHistory(result) {
         timestamp: new Date().toISOString()
     };
     quizHistory.unshift(entry);
-    // Keep only last 10 entries
-    if (quizHistory.length > 10) {
-        quizHistory = quizHistory.slice(0, 10);
-    }
+    if (quizHistory.length > 10) quizHistory = quizHistory.slice(0, 10);
     localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
-}
-
-// ============================================
-// Confetti Effect
-// ============================================
-
-function createConfetti() {
-    const colors = ['#dc2626', '#f97316', '#3b82f6', '#a855f7', '#ec4899', '#f59e0b', '#eab308', '#9ca3af', '#15803d', '#38bdf8'];
-    const container = document.body;
-
-    for (let i = 0; i < 100; i++) {
-        setTimeout(() => {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-            container.appendChild(confetti);
-
-            setTimeout(() => {
-                confetti.remove();
-            }, 4000);
-        }, i * 20);
-    }
-}
-
-// ============================================
-// Toast Notification
-// ============================================
-
-function showToast(message, type = 'success') {
-    const existingToast = document.querySelector('.toast');
-    if (existingToast) {
-        existingToast.remove();
-    }
-
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
-    document.body.appendChild(toast);
-
-    setTimeout(() => toast.classList.add('show'), 10);
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-// ============================================
-// Share Functions
-// ============================================
-
-function getShareText(result) {
-    return `ผลทดสอบ: ฉันคือ "${result.name}" ในการเมืองไทย! 🇹🇭\n\nคุณคือสีอะไร? มาทำแบบทดสอบกันเลย! 👇`;
-}
-
-function getShareUrl(resultId) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('result', resultId);
-    return url.toString();
-}
-
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        showToast('คัดลอกลิงก์แล้ว!');
-    }).catch(() => {
-        showToast('คัดลอกไม่สำเร็จ', 'error');
-    });
-}
-
-function shareTwitter(result) {
-    const text = encodeURIComponent(getShareText(result));
-    const url = encodeURIComponent(getShareUrl(result.id));
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-}
-
-function shareFacebook(result) {
-    const url = encodeURIComponent(getShareUrl(result.id));
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-}
-
-function shareLine(result) {
-    const text = encodeURIComponent(getShareText(result) + '\n' + getShareUrl(result.id));
-    window.open(`https://social-plugins.line.me/lineit/share?url=${text}`, '_blank');
 }
 
 // ============================================
@@ -363,149 +352,83 @@ function shareLine(result) {
 // ============================================
 
 function renderStartScreen() {
-    // Reset state
     currentQuestionIndex = 0;
-    scores = { NAM_MAK: 0, NOM_PHONG: 0, MADAM: 0, DARA: 0, BLUE: 0, SKY_BLUE: 0, ORANGE_ACADEMIC: 0, ORANGE_FAN: 0, YELLOW_CLASSIC: 0, YELLOW_ROYALIST: 0, GREEN: 0, WHITE: 0 };
+    resetScores();
     currentResult = null;
 
     contentDiv.innerHTML = `
-        <div class="text-center w-full fade-in">
-            <div class="text-6xl mb-6 animate-bounce">🤔</div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">ค้นหา "สี" ในใจคุณ</h2>
-            <p class="text-gray-600 mb-8 px-4 leading-relaxed">
-                การเมืองไทยไม่ได้มีแค่สองด้าน...<br>
-                คุณอาจจะใส่เสื้อแดง... แต่แดงเฉดไหน?<br>
-                <span class="text-red-800 font-bold">แดงน้ำหมาก?</span>
-                <span class="text-green-800 font-bold">เขียวลายพราง?</span> <br>
-                <span class="text-orange-600 font-bold">ส้มแบก?</span>
-                <span class="text-sky-500 font-bold">ฟ้าประชาธิปัตย์?</span> <br>
-                หรือ <span class="text-yellow-600 font-bold">เหลืองรักชาติ</span>?
+        <div class="text-center w-full fade-in font-['Kanit']">
+            <div class="text-6xl mb-6 animate-bounce">🕹️</div>
+            <h2 class="text-2xl font-bold text-white mb-4 font-['Press_Start_2P'] text-[12px] leading-relaxed">SELECT PLAYER</h2>
+            <p class="text-gray-400 mb-8 px-4 leading-relaxed text-[11px]">
+                การเมืองไทย ยุค 90s อาร์เคด<br>
+                คุณคือสีอะไรในตำนาน?<br>
+                <span class="text-red-500 font-bold">แดงน้ำหมาก</span> VS <span class="text-orange-500 font-bold">ส้มแบก</span><br>
+                ฝ่าด่าน ${questions.length} คำถามเพื่อค้นหาตัวคุณ!
             </p>
-            ${quizHistory.length > 0 ? renderHistorySummary() : ''}
-            <button onclick="startGame()" class="w-full bg-red-600 text-white py-4 rounded-xl text-xl font-bold shadow-lg hover:bg-red-700 hover:shadow-xl transition-all transform hover:-translate-y-1 active:translate-y-0">
-                เริ่มทำแบบทดสอบ
+            <button onclick="startGame()" class="choice-btn w-full bg-red-600 text-white py-4 text-sm font-bold font-['Press_Start_2P'] blink">
+                START GAME
             </button>
         </div>
     `;
 }
 
-function renderHistorySummary() {
-    const lastResult = quizHistory[0];
-    const date = new Date(lastResult.timestamp);
-    const timeAgo = getTimeAgo(date);
-
-    return `
-        <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-200">
-            <p class="text-sm text-gray-600 mb-2">ผลล่าสุดของคุณ (${timeAgo})</p>
-            <div class="flex items-center justify-center gap-2">
-                <span class="text-3xl">${lastResult.resultIcon}</span>
-                <span class="font-bold text-gray-800">${lastResult.resultName}</span>
-            </div>
-        </div>
-    `;
-}
-
-function getTimeAgo(date) {
-    const seconds = Math.floor((new Date() - date) / 1000);
-    const intervals = {
-        ปี: 31536000,
-        เดือน: 2592000,
-        สัปดาห์: 604800,
-        วัน: 86400,
-        ชั่วโมง: 3600,
-        นาที: 60
-    };
-
-    for (const [unit, secondsInUnit] of Object.entries(intervals)) {
-        const interval = Math.floor(seconds / secondsInUnit);
-        if (interval >= 1) {
-            return `${interval} ${unit}ที่แล้ว`;
-        }
-    }
-    return 'เมื่อสักครู่';
-}
-
 function startGame() {
+    sound.playSelect();
     renderQuestion();
 }
 
 function renderQuestion() {
     const q = questions[currentQuestionIndex];
-    const progress = ((currentQuestionIndex) / questions.length) * 100;
-    const progressPercent = Math.round(progress);
+    const progress = (currentQuestionIndex / questions.length) * 100;
 
     let html = `
         <div class="w-full h-full flex flex-col fade-in">
-            <!-- Progress Bar -->
             <div class="progress-container">
                 <div class="progress-bar" style="width: ${progress}%"></div>
             </div>
-            <div class="progress-text">${progressPercent}%</div>
+            <div class="progress-text">STAGE ${currentQuestionIndex + 1} / ${questions.length}</div>
 
-            <!-- Question -->
-            <h3 class="text-xl font-bold text-gray-800 mb-6 leading-relaxed">
-                <span class="text-red-500 text-sm block mb-1">ข้อที่ ${currentQuestionIndex + 1}/${questions.length}</span>
+            <h3 class="text-lg font-bold text-white mb-6 leading-relaxed font-['Kanit']">
                 ${q.q}
             </h3>
 
-            <!-- Choices -->
-            <div class="space-y-3 flex-1 overflow-y-auto pb-4">
+            <div class="space-y-1 flex-1 overflow-y-auto pb-4">
     `;
 
     q.choices.forEach((choice, index) => {
         html += `
-            <button onclick="selectChoice(${index})" class="choice-btn w-full text-left p-4 rounded-xl border border-gray-200 hover:border-red-400 hover:bg-red-50 bg-white transition-colors group" data-key="${index + 1}">
-                <span class="font-medium text-gray-700 group-hover:text-red-700">${choice.text}</span>
+            <button onclick="selectChoice(${index})" class="choice-btn w-full text-left p-4">
+                <span class="font-medium text-sm">${choice.text}</span>
             </button>
         `;
     });
 
-    html += `
-            <!-- Choices -->
-            <div class="space-y-3 flex-1 overflow-y-auto pb-4">
-    `;
-
-    q.choices.forEach((choice, index) => {
-        html += `
-            <button onclick="selectChoice(${index})" class="choice-btn w-full text-left p-4 rounded-xl border border-gray-200 hover:border-red-400 hover:bg-red-50 bg-white transition-colors group" data-key="${index + 1}">
-                <span class="font-medium text-gray-700 group-hover:text-red-700">${choice.text}</span>
-            </button>
-        `;
-    });
-
-    html += `
-            </div>
-        </div>
-    `;
+    html += `</div></div>`;
     contentDiv.innerHTML = html;
 }
 
 function selectChoice(choiceIndex) {
+    sound.playBeep();
     const q = questions[currentQuestionIndex];
     const selectedChoice = q.choices[choiceIndex];
 
-    // Update scores
     for (const [key, value] of Object.entries(selectedChoice.score)) {
-        scores[key] += value;
+        scores[key] = (scores[key] || 0) + value;
     }
 
-    // Next question or Result
     currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
-        setTimeout(() => {
-            renderQuestion();
-        }, 200);
+        setTimeout(renderQuestion, 150);
     } else {
         showResult();
     }
 }
 
-function showResult() {
-    // Calculate winner
+async function showResult() {
+    sound.playWin();
     let maxScore = -1;
-    let winnerKey = '';
-
-    console.log("Final Scores:", scores);
+    let winnerKey = 'WHITE';
 
     for (const [key, value] of Object.entries(scores)) {
         if (value > maxScore) {
@@ -517,109 +440,82 @@ function showResult() {
     const result = categories[winnerKey];
     currentResult = result;
 
-    // Save to history
     saveToHistory(result);
-
-    // Trigger confetti
-    createConfetti();
+    saveResultToDatabase(result);
 
     contentDiv.innerHTML = `
-        <div class="w-full h-full flex flex-col items-center text-center scale-in overflow-y-auto pb-8">
-            <div class="text-lg font-bold text-gray-400 mb-2">คุณคือ...</div>
+        <div class="w-full h-full flex flex-col items-center text-center scale-in overflow-y-auto pb-8 font-['Kanit']">
+            <div class="text-[10px] font-['Press_Start_2P'] text-gray-500 mb-2">YOU ARE...</div>
 
-            <div class="text-8xl mb-4 animate-pulse-custom">${result.icon}</div>
+            <div class="text-7xl mb-4 animate-pulse-custom">${result.icon}</div>
 
-            <h2 class="text-3xl font-extrabold ${result.textClass} mb-2 drop-shadow-sm">
+            <h2 class="text-2xl font-black ${result.textClass} mb-2 uppercase italic">
                 ${result.name}
             </h2>
 
-            <div class="w-full h-1 w-24 ${result.colorClass} rounded-full mx-auto mb-6"></div>
-
-            <div class="result-card">
-                <p class="text-gray-700 leading-relaxed font-medium">
+            <div class="result-card mb-6 w-full">
+                <p class="leading-relaxed font-bold text-sm text-green-400">
                     "${result.desc}"
                 </p>
             </div>
 
-            <!-- Share Buttons -->
-            <div class="share-buttons">
-                <button onclick="copyToClipboard('${getShareUrl(result.id)}')" class="share-btn copy">
-                    <span>📋</span> คัดลอกลิงก์
-                </button>
-                <button onclick="shareTwitter(currentResult)" class="share-btn twitter">
-                    <span>𝕏</span> แชร์ทวิตเตอร์
-                </button>
-                <button onclick="shareFacebook(currentResult)" class="share-btn facebook">
-                    <span>f</span> แชร์เฟซบุ๊ก
-                </button>
-                <button onclick="shareLine(currentResult)" class="share-btn line">
-                    <span>LINE</span> แชร์ไลน์
-                </button>
+            <div class="grid grid-cols-2 gap-2 w-full mb-4">
+                <button onclick="renderStartScreen()" class="choice-btn text-[10px] py-2 font-['Press_Start_2P']">RETRY</button>
+                <button onclick="showStats()" class="choice-btn text-[10px] py-2 font-['Press_Start_2P']" style="border-color: #0f0">STATS</button>
             </div>
-
-            ${quizHistory.length > 1 ? renderHistoryPanel() : ''}
-
-            <button onclick="renderStartScreen()" class="w-full bg-gray-800 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-gray-900 transition-all mt-4">
-                เล่นใหม่อีกครั้ง
-            </button>
+            
+            <div class="text-[8px] text-gray-500 font-['Press_Start_2P']">GAME OVER</div>
         </div>
     `;
 }
 
-function renderHistoryPanel() {
-    let historyHtml = `
-        <div class="history-panel">
-            <h4 class="text-sm font-bold text-gray-600 mb-3">ประวัติการทำแบบทดสอบ</h4>
+async function showStats() {
+    sound.playSelect();
+    const stats = await getGlobalStats();
+    const total = Object.values(stats).reduce((a, b) => a + b, 0) || 1;
+
+    let html = `
+        <div class="w-full h-full flex flex-col fade-in font-['Kanit']">
+            <h2 class="text-[10px] font-['Press_Start_2P'] text-white mb-6 text-center">GLOBAL RANKING</h2>
+            <div class="stats-container flex-1 overflow-y-auto pr-2">
     `;
 
-    quizHistory.slice(1, 4).forEach((entry, index) => {
-        const date = new Date(entry.timestamp);
-        historyHtml += `
-            <div class="history-item">
-                <span class="history-icon">${entry.resultIcon}</span>
-                <div class="history-info">
-                    <div class="history-name">${entry.resultName}</div>
-                    <div class="history-date">${getTimeAgo(date)}</div>
+    const sortedCategories = Object.keys(categories).sort((a, b) => (stats[b] || 0) - (stats[a] || 0));
+
+    sortedCategories.forEach(key => {
+        const cat = categories[key];
+        const count = stats[key] || 0;
+        const percent = Math.round((count / total) * 100);
+        
+        // Simple color map for stats bars
+        const colorMap = {
+            'bg-red-700': '#b91c1c', 'bg-pink-500': '#ec4899', 'bg-red-500': '#ef4444',
+            'bg-purple-600': '#9333ea', 'bg-orange-500': '#f97316', 'bg-blue-600': '#2563eb',
+            'bg-sky-400': '#38bdf8', 'bg-orange-400': '#fb923c', 'bg-orange-600': '#ea580c',
+            'bg-yellow-400': '#facc15', 'bg-yellow-600': '#ca8a04', 'bg-green-700': '#15803d',
+            'bg-gray-400': '#9ca3af'
+        };
+
+        html += `
+            <div class="bar-row">
+                <div class="bar-label">
+                    <span class="text-[11px]">${cat.icon} ${cat.name}</span>
+                    <span class="text-[10px] font-['Press_Start_2P']">${percent}%</span>
+                </div>
+                <div class="bar-outer">
+                    <div class="bar-inner" style="width: ${percent}%; background-color: ${colorMap[cat.colorClass] || '#f00'}"></div>
                 </div>
             </div>
         `;
     });
 
-    historyHtml += `</div>`;
-    return historyHtml;
-}
+    html += `
+            </div>
+            <button onclick="renderStartScreen()" class="choice-btn w-full mt-4 font-['Press_Start_2P'] text-[10px]">BACK</button>
+        </div>
+    `;
 
-// ============================================
-// URL Parameter Handling (Shared Results)
-// ============================================
-
-function checkSharedResult() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const resultParam = urlParams.get('result');
-
-    if (resultParam && categories[resultParam]) {
-        currentResult = categories[resultParam];
-        showResult();
-        return true;
-    }
-    return false;
-}
-
-// ============================================
-// Keyboard Support
-// ============================================
-
-function handleKeyPress(e) {
-    // Only handle number keys during question phase
-    if (currentQuestionIndex < questions.length) {
-        const key = parseInt(e.key);
-        if (key >= 1 && key <= 8) {
-            const currentQuestion = questions[currentQuestionIndex];
-            if (key <= currentQuestion.choices.length) {
-                selectChoice(key - 1);
-            }
-        }
-    }
+    contentDiv.innerHTML = html;
 }
 
 // ============================================
@@ -627,39 +523,18 @@ function handleKeyPress(e) {
 // ============================================
 
 function init() {
-    // Initialize dark mode
-    initDarkMode();
-
-    // Load history
     loadHistory();
-
-    // Check for shared result
-    if (!checkSharedResult()) {
-        // Show start screen
+    setupSound();
+    
+    // Check for shared result (disabled for now or could be re-implemented)
+    const urlParams = new URLSearchParams(window.location.search);
+    const resultParam = urlParams.get('result');
+    if (resultParam && categories[resultParam]) {
+        scores[resultParam] = 100; // Force result
+        showResult();
+    } else {
         renderStartScreen();
     }
-
-    // Add keyboard listener
-    document.addEventListener('keydown', handleKeyPress);
-
-    // Add dark mode toggle to header
-    const header = document.querySelector('.bg-gradient-to-r');
-    if (header) {
-        const toggle = document.createElement('button');
-        toggle.className = 'dark-mode-toggle';
-        toggle.innerHTML = `
-            <span class="sun-icon">☀️</span>
-            <span class="moon-icon">🌙</span>
-        `;
-        toggle.onclick = toggleDarkMode;
-        header.style.position = 'relative';
-        header.appendChild(toggle);
-    }
 }
 
-// Start the app when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
-}
+document.addEventListener('DOMContentLoaded', init);

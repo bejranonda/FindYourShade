@@ -17,37 +17,46 @@
     <!-- TailwindCSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts - Kanit -->
+    <!-- Google Fonts - Kanit & Press Start 2P -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Press+Start+2P&display=swap"
         rel="stylesheet">
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-red-100 via-orange-50 to-blue-50">
+<body class="min-h-screen flex items-center justify-center p-4 bg-[#1a1a1a] arcade-bg">
+    <!-- CRT Effect Overlay -->
+    <div class="crt-overlay pointer-events-none"></div>
+    <div class="scanlines pointer-events-none"></div>
 
     <!-- App Container -->
     <div id="app"
-        class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[650px] flex flex-col relative border border-gray-100">
+        class="w-full max-w-md bg-[#222] rounded-none shadow-[0_0_20px_rgba(255,0,0,0.3)] overflow-hidden min-h-[650px] flex flex-col relative border-4 border-[#444] arcade-window">
 
         <!-- Header -->
-        <div class="bg-gradient-to-r from-red-600 to-red-500 p-4 text-center shadow-md relative z-10">
-            <h1 class="text-white text-xl font-bold tracking-wider drop-shadow-md">THAI POLITICAL QUIZ</h1>
-            <p class="text-red-100 text-xs mt-1">เช็คเฉดสีการเมืองในตัวคุณ</p>
+        <div class="bg-[#333] border-b-4 border-[#444] p-4 text-center relative z-10 arcade-header">
+            <h1 class="text-[#ff0000] text-sm font-['Press_Start_2P'] tracking-tighter drop-shadow-[2px_2px_0_#000]">FIND YOUR SHADE</h1>
+            <p class="text-white text-[10px] mt-2 font-['Press_Start_2P']">INSERT COIN</p>
+            
+            <!-- Sound Toggle -->
+            <button id="sound-toggle" class="absolute right-4 top-1/2 -translate-y-1/2 text-white opacity-70 hover:opacity-100 transition-opacity">
+                <span id="sound-icon">🔊</span>
+            </button>
         </div>
 
         <!-- Content Area -->
-        <div id="content" class="flex-1 p-6 flex flex-col justify-center items-center relative overflow-y-auto">
+        <div id="content" class="flex-1 p-6 flex flex-col justify-center items-center relative overflow-y-auto z-10">
             <!-- Dynamic Content will be injected here -->
         </div>
 
         <!-- Footer -->
-        <div class="p-3 text-center text-gray-400 text-[10px] border-t bg-gray-50">
-            <div class="mb-1">แบบทดสอบเพื่อความบันเทิงและการเสียดสีสังคมเท่านั้น มิได้มีเจตนาสร้างความแตกแยก</div>
-            <div class="font-medium opacity-75">v2.3.0</div>
+        <div class="p-3 text-center text-[#666] text-[10px] border-t-4 border-[#444] bg-[#222] z-10 font-['Press_Start_2P']">
+            <div class="mb-1">© 199X RETRO ARCADE SYSTEM</div>
+            <div class="font-medium opacity-75">v3.0.0-RETRO</div>
+            <button onclick="showStats()" class="mt-2 text-[#ff0000] hover:underline cursor-pointer">GLOBAL STATS</button>
         </div>
     </div>
 
