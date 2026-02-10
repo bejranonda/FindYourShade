@@ -17,7 +17,7 @@ A fun, interactive quiz to discover your political shade in Thai politics.
   - 🌩️ ฟ้า (Sky Blue) | 🪖 เขียว (Green) | 🏳️ ขาว (Silent White)
 
 - **Immersive Gameplay**
-  - **Spectacular Confetti:** Fireworks-like celebration with rapid side-shooting confetti in political shade colors
+  - **Category-Specific Emoji Rain:** Each political shade has unique symbols (e.g., 🥊❤️ for Nam Mak, 🌿💰 for Blue, 👑🏛️ for Royalist) that rain down in celebration
   - **8-bit Sound System:** Procedural sound effects (Beep, Select, Win) generated via Web Audio API
   - **Progress Tracking:** Visual progress bar as you navigate through 7 questions
   - **Global Stats:** Real-time ranking of results persisted in Cloudflare D1 database
@@ -104,7 +104,7 @@ database_id = "your-database-id-here"  # Replace with actual ID
 | **Cloudflare D1** | Serverless SQLite database |
 | **Cloudflare Pages Functions** | Serverless API endpoints |
 | **Web Audio API** | 8-bit sound effects |
-| **canvas-confetti** | Advanced particle effects |
+| **CSS Animations** | Emoji rain effects |
 | **Google Fonts** | Kanit (Thai) & Press Start 2P |
 
 ## 📁 Project Structure
@@ -141,9 +141,9 @@ FindYourShade/
 ## 📝 Changelog
 
 ### v3.6.0 (2025-02-10)
-- **Added:** Spectacular fireworks-like confetti shooting from both sides
-- **Added:** canvas-confetti library for advanced particle effects
-- **Improved:** Celebration moment with rapid, colorful confetti bursts in political shade colors
+- **Added:** Category-specific emoji rain celebration (80 emojis per result)
+- Each political shade has unique symbols: 🥊❤️ (Nam Mak), 🍼❤️ (Nom Phong), 🍷👠 (Madam), ✨⭐ (Dara), 🍊💡 (Orange), 🌿💰 (Blue), 💧🕊️ (Sky Blue), 📚💡 (Academic Orange), 🔥🧡 (Fandom Orange), 🎗️💛 (Classic Yellow), 👑🏛️ (Royalist), 🪖🛡️ (Green), ☕🏳️ (White)
+- **Removed:** Fireworks/side-shooting confetti (simplified to emoji rain only)
 
 ### v3.5.0 (2025-02-10)
 - **Added:** Cloudflare D1 database for true global stats
