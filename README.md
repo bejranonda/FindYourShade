@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? - Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.6.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.7.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
 A fun, interactive quiz to discover your political shade in Thai politics.
@@ -139,6 +139,14 @@ FindYourShade/
 4. Share your result with friends
 
 ## 📝 Changelog
+
+### v3.7.0 (2025-02-11)
+- **Fixed:** Title updated to be more inclusive of all political shades (not just "red")
+- **Added:** D1 database binding configured for global stats persistence
+- **Changed:** Stats text shortened from "สถิติผลลัพธ์จากผู้เล่น" to "ผลลัพธ์จากผู้เล่น"
+- **Simplified:** Removed canvas-confetti library, using CSS emoji rain only
+- Each political shade now has 1-2 unique symbols that rain down (80 emojis total)
+- Symbol mapping: 🥊❤️ (Nam Mak), 🍼❤️ (Nom Phong), 🍷👠 (Madam), ✨⭐ (Dara), 🍊💡 (Orange), 🌿💰 (Blue), 💧🕊️ (Sky Blue), 📚💡 (Academic Orange), 🔥🧡 (Fandom Orange), 🎗️💛 (Classic Yellow), 👑🏛️ (Royalist), 🪖🛡️ (Green), ☕🏳️ (White)
 
 ### v3.6.0 (2025-02-10)
 - **Added:** Category-specific emoji rain celebration (80 emojis per result)
