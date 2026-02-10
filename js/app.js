@@ -275,6 +275,7 @@ resetScores();
 
 let currentResult = null;
 let quizHistory = [];
+let answerHistory = []; // Track answers for back functionality
 
 // ============================================
 // Database (Cloudflare Worker Mock)
@@ -355,6 +356,7 @@ function renderStartScreen() {
     currentQuestionIndex = 0;
     resetScores();
     currentResult = null;
+    answerHistory = []; // Clear answer history
 
     contentDiv.innerHTML = `
         <div class="text-center w-full fade-in font-['Kanit']">
@@ -392,6 +394,12 @@ function renderQuestion() {
                 <div class="progress-bar" style="width: ${progress}%"></div>
             </div>
 
+            ${currentQuestionIndex > 0 ? `
+            <button onclick="goBack()" class="self-start text-sm text-gray-500 hover:text-[#003087] transition-colors mb-3 flex items-center gap-1">
+                <span>←</span> ย้อนกลับ
+            </button>
+            ` : ''}
+
             <h3 class="text-xl font-bold text-gray-800 mb-6 leading-relaxed" style="font-size: 1.25rem;">
                 ${q.q}
             </h3>
@@ -416,6 +424,14 @@ function selectChoice(choiceIndex) {
     const q = questions[currentQuestionIndex];
     const selectedChoice = q.choices[choiceIndex];
 
+    // Store this answer for potential back navigation
+    answerHistory.push({
+        questionIndex: currentQuestionIndex,
+        choiceIndex: choiceIndex,
+        score: {...selectedChoice.score}
+    });
+
+    // Add scores
     for (const [key, value] of Object.entries(selectedChoice.score)) {
         scores[key] = (scores[key] || 0) + value;
     }
@@ -425,6 +441,25 @@ function selectChoice(choiceIndex) {
         setTimeout(renderQuestion, 150);
     } else {
         showResult();
+    }
+}
+
+function goBack() {
+    sound.playBeep();
+
+    // Remove the last answer from history
+    const lastAnswer = answerHistory.pop();
+
+    if (lastAnswer) {
+        // Subtract the scores from the last answer
+        for (const [key, value] of Object.entries(lastAnswer.score)) {
+            scores[key] = (scores[key] || 0) - value;
+            if (scores[key] <= 0) delete scores[key];
+        }
+
+        // Go back to the previous question
+        currentQuestionIndex = lastAnswer.questionIndex;
+        renderQuestion();
     }
 }
 
@@ -463,15 +498,34 @@ async function showResult() {
             </div>
 
             <div class="grid grid-cols-2 gap-3 w-full mb-4">
-                <button onclick="renderStartScreen()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-bold transition-colors">
-                    🔄 เล่นอีกครั้ง
+                <button onclick="goBackFromResult()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-bold transition-colors">
+                    ← ย้อนแก้ไข
                 </button>
                 <button onclick="showStats()" class="bg-[#003087] hover:bg-[#002466] text-white py-3 rounded-lg font-bold transition-colors">
                     📊 ดูผลโพลรวม
                 </button>
             </div>
+
+            <button onclick="renderStartScreen()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-bold transition-colors">
+                🔄 เล่นใหม่อีกครั้ง
+            </button>
         </div>
     `;
+}
+
+function goBackFromResult() {
+    sound.playBeep();
+    // Go back to the last question
+    if (answerHistory.length > 0) {
+        const lastAnswer = answerHistory.pop();
+        // Subtract the scores from the last answer
+        for (const [key, value] of Object.entries(lastAnswer.score)) {
+            scores[key] = (scores[key] || 0) - value;
+            if (scores[key] <= 0) delete scores[key];
+        }
+        currentQuestionIndex = lastAnswer.questionIndex;
+        renderQuestion();
+    }
 }
 
 async function showStats() {

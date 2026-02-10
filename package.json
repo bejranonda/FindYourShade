@@ -1,6 +1,6 @@
 {
   "name": "findyourshade",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Thai Political Shade Quiz",
   "scripts": {
     "build:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --minify",
