@@ -1,4 +1,4 @@
-# คุณคือแดงเฉดไหน? - Thai Political Shade Quiz
+# คุณคือเฉดสีการเมืองไหน? - Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
 [![Version](https://img.shields.io/badge/version-3.6.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
