@@ -8,15 +8,12 @@ compatibility_date = "2024-01-01"
 [build]
 command = "npm run build:css"
 cwd = "."
-watch_paths = ["css/**", "js/**", "*.html"]
 
 # D1 Database Binding
-# Create database first: wrangler d1 create DB --name=findyourshade-db
-# Then uncomment and update with your database ID:
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "findyourshade-db"
-# database_id = "your-database-id-here"
+[[d1_databases]]
+binding = "DB"
+database_name = "DB"
+database_id = "7e5bd3e8-425c-4447-b340-60cbc14c57f6"
 
 # Environment variables (optional)
 # [vars]
