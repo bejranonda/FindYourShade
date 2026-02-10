@@ -1,7 +1,7 @@
 # คุณคือแดงเฉดไหน? - Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.2.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.3.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
 A fun, interactive quiz to discover your political shade in Thai politics.
@@ -109,6 +109,12 @@ FindYourShade/
 4. Share your result with friends
 
 ## 📝 Changelog
+
+### v3.3.0 (2025-02-10)
+- **Added:** wrangler.toml for Cloudflare Pages configuration
+- **Added:** MIT License for open source compliance
+- **Improved:** Documentation with comprehensive deployment guides
+- **Infrastructure:** GitHub connected to Cloudflare Pages with auto-deploy
 
 ### v3.2.0 (2025-02-10)
 - **Fixed:** Removed stale submodule reference causing Cloudflare build failures
