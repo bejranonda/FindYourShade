@@ -3,18 +3,10 @@
 
 name = "findyourshade"
 compatibility_date = "2024-01-01"
-
-# Build configuration for Cloudflare Pages
-[build]
-command = "npm run build:css"
-cwd = "."
+pages_build_output_dir = "."
 
 # D1 Database Binding
 [[d1_databases]]
 binding = "DB"
 database_name = "DB"
 database_id = "7e5bd3e8-425c-4447-b340-60cbc14c57f6"
-
-# Environment variables (optional)
-# [vars]
-# ENVIRONMENT = "production"
