@@ -81,18 +81,21 @@ wrangler d1 create DB --name=findyourshade-db
 
 2. **Run the schema:**
 ```bash
-wrangler d1 execute findyourshade-db --file=schema.sql
+wrangler d1 execute DB --remote --file=schema.sql
 ```
 
-3. **Update `wrangler.toml`** with your database ID:
+3. **D1 database is pre-configured** in `wrangler.toml`:
 ```toml
 [[d1_databases]]
 binding = "DB"
-database_name = "findyourshade-db"
-database_id = "your-database-id-here"  # Replace with actual ID
+database_name = "DB"
+database_id = "7e5bd3e8-425c-4447-b340-60cbc14c57f6"
 ```
 
-4. **Deploy to activate the bindings**
+4. **Deploy with wrangler:**
+```bash
+wrangler pages deploy . --project-name=findyourshade
+```
 
 ## 🛠️ Tech Stack
 
@@ -143,6 +146,7 @@ FindYourShade/
 ### v3.7.0 (2025-02-11)
 - **Fixed:** Title updated to be more inclusive of all political shades (not just "red")
 - **Added:** D1 database binding configured for global stats persistence
+- **Fixed:** wrangler.toml with proper `pages_build_output_dir` for deployment
 - **Changed:** Stats text shortened from "สถิติผลลัพธ์จากผู้เล่น" to "ผลลัพธ์จากผู้เล่น"
 - **Simplified:** Removed canvas-confetti library, using CSS emoji rain only
 - Each political shade now has 1-2 unique symbols that rain down (80 emojis total)
