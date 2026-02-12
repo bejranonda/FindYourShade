@@ -1147,7 +1147,7 @@ async function showStats() {
     sortedCategories.forEach(key => {
         const cat = categories[key];
         const count = stats[key] || 0;
-        const percent = Math.round((count / total) * 100);
+        const percent = ((count / total) * 100).toFixed(1);
 
         // Simple color map for stats bars
         const colorMap = {
@@ -1164,7 +1164,7 @@ async function showStats() {
                     <span class="text-sm font-medium text-gray-700 flex items-center gap-2">
                         <span>${cat.icon}</span> ${cat.name[currentLang]}
                     </span>
-                    <span class="text-sm font-bold text-[#003087]">${percent}%</span>
+                    <span class="text-sm font-bold text-[#003087]">${count.toLocaleString()} <span class="font-normal text-gray-500">(${percent}%)</span></span>
                 </div>
                 <div class="bar-outer">
                     <div class="bar-inner" style="width: ${percent}%; background-color: ${colorMap[cat.colorClass] || '#999'}"></div>
