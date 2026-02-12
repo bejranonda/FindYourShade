@@ -1069,7 +1069,7 @@ async function showStats() {
     let html = `
         <div class="w-full h-full flex flex-col fade-in font-['Kanit']">
             <h2 class="text-xl font-bold text-[#003087] mb-2 text-center">📊 ${t.globalStatsTitle}</h2>
-            <div class="text-center mb-5">
+            <div class="text-center" style="margin-bottom: 32px;">
                 <span class="inline-flex items-center px-4 py-2 bg-[#003087]/10 rounded-full">
                     <span class="text-gray-600 text-sm">👥 ${t.totalPlayers}:</span>
                     <span class="text-[#003087] font-bold text-lg ml-2">${total.toLocaleString()}</span>
