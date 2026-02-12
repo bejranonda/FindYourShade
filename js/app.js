@@ -96,7 +96,7 @@ const translations = {
         playAgain: "เล่นใหม่อีกครั้ง",
         globalStatsTitle: "ผลลัพธ์จากผู้เล่น",
         backHome: "กลับหน้าหลัก",
-        share: "📸 แชร์ผลลัพธ์",
+        share: "แชร์ผลลัพธ์",
         screenshot: "บันทึกรูปผลลัพธ์",
         footerRelease: "Release: v3.6.1",
         footerSequel: "ภาคต่อของ Sim Thailand 2569"
@@ -123,7 +123,7 @@ const translations = {
         playAgain: "Play Again",
         globalStatsTitle: "Player Response Statistics",
         backHome: "Back to Home",
-        share: "📸 Share Result",
+        share: "Share Result",
         screenshot: "Save Result Image",
         footerRelease: "Release: v3.6.1",
         footerSequel: "Sequel to Sim Thailand 2569"
@@ -805,17 +805,17 @@ async function showResult() {
     if (sortedScores.length > 1) {
         const runnerUps = sortedScores.slice(1, 3); // 2nd and 3rd place
         runnersUpHtml = `
-            <div class="runners-up mt-4 w-full">
-                <div class="text-xs font-semibold text-gray-400 mb-2">${t.runnersUp}</div>
-                <div class="flex justify-center gap-6">
+            <div class="runners-up mt-5 pt-4 border-t border-gray-200 w-full">
+                <div class="text-sm font-semibold text-gray-500 mb-3">${t.runnersUp}</div>
+                <div class="flex justify-center gap-10">
                     ${runnerUps.map(([key, score]) => {
                         const cat = categories[key];
                         const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
                         return `
-                            <div class="text-center">
-                                <div class="text-4xl mb-1">${cat.icon}</div>
-                                <div class="text-sm text-gray-600 font-medium">${cat.name[currentLang].split(' ')[0]}</div>
-                                <div class="text-lg font-bold ${cat.textClass}">${pct}%</div>
+                            <div class="text-center flex flex-col items-center">
+                                <div class="text-5xl mb-2">${cat.icon}</div>
+                                <div class="text-base text-gray-600 font-medium mb-1">${cat.name[currentLang].split(' ')[0]}</div>
+                                <div class="text-xl font-bold ${cat.textClass}">${pct}%</div>
                             </div>
                         `;
                     }).join('')}

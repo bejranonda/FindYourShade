@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.12.1-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.12.2-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -233,6 +233,11 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.12.2 (2025-02-12)
+- **Fixed:** Removed duplicate camera emoji from share button
+- **Improved:** Runner-up emojis larger (text-5xl) with better spacing (gap-10)
+- **Improved:** Added border separator above runner-ups section
 
 ### v3.12.1 (2025-02-12)
 - **Fixed:** Main emoji size restored to text-8xl (was too small)
