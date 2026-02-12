@@ -1164,7 +1164,7 @@ async function showStats() {
                     <span class="text-sm font-medium text-gray-700 flex items-center gap-2">
                         <span>${cat.icon}</span> ${cat.name[currentLang]}
                     </span>
-                    <span class="text-sm font-bold text-[#003087]">${count.toLocaleString()} <span class="font-normal text-gray-500">(${percent}%)</span></span>
+                    <span class="text-sm font-bold text-[#003087]">${count.toLocaleString()}</span> <span class="text-sm text-gray-500">(${percent}%)</span>
                 </div>
                 <div class="bar-outer">
                     <div class="bar-inner" style="width: ${percent}%; background-color: ${colorMap[cat.colorClass] || '#999'}"></div>
