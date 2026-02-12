@@ -885,70 +885,107 @@ async function captureAndShare() {
     sound.playBeep();
 
     const t = translations[currentLang];
-    const resultContent = document.getElementById('result-content');
 
-    if (!resultContent) {
-        alert('Error: Result content not found');
-        return;
+    // Calculate scores for display
+    let totalScore = 0;
+    let maxScore = 0;
+    for (const [key, value] of Object.entries(scores)) {
+        totalScore += value;
+        if (value > maxScore) maxScore = value;
     }
+    const matchPercent = totalScore > 0 ? Math.round((maxScore / totalScore) * 100) : 100;
 
-    // Create a clone for screenshot
-    const clone = resultContent.cloneNode(true);
-    clone.style.cssText = `
+    // Get runner-ups
+    const sortedScores = Object.entries(scores)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3);
+    const runnerUps = sortedScores.slice(1, 3);
+
+    // Create a clean screenshot container
+    const container = document.createElement('div');
+    container.id = 'screenshot-container';
+    container.style.cssText = `
         position: fixed;
         left: -9999px;
         top: 0;
-        width: 400px;
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        padding: 30px 25px;
+        width: 420px;
+        background: linear-gradient(180deg, #f0f4f8 0%, #e2e8f0 100%);
+        padding: 30px;
         font-family: 'Kanit', sans-serif;
+        box-sizing: border-box;
     `;
 
-    // Add branding header
-    const header = document.createElement('div');
-    header.innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #003087;">
-            <div style="font-size: 14px; color: #003087; font-weight: bold;">คุณคือเฉดสีการเมืองไหน?</div>
-            <div style="font-size: 11px; color: #6b7280;">Thai Political Shade Quiz</div>
+    // Build the screenshot HTML with inline styles
+    container.innerHTML = `
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #003087;">
+            <div style="font-size: 16px; color: #003087; font-weight: bold;">คุณคือเฉดสีการเมืองไหน?</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Thai Political Shade Quiz</div>
+        </div>
+
+        <!-- Result Title -->
+        <div style="text-align: center; margin-bottom: 15px;">
+            <div style="font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">${t.resultTitle}</div>
+        </div>
+
+        <!-- Main Emoji -->
+        <div style="text-align: center; margin-bottom: 15px;">
+            <span style="font-size: 80px; line-height: 1;">${currentResult.icon}</span>
+        </div>
+
+        <!-- Result Name -->
+        <div style="text-align: center; margin-bottom: 8px;">
+            <span style="font-size: 26px; font-weight: 800; color: ${getColorHex(currentResult.colorClass)};">${currentResult.name[currentLang]}</span>
+        </div>
+
+        <!-- Match Percentage -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span style="font-size: 36px; font-weight: 800; color: #003087;">${matchPercent}%</span>
+            <span style="font-size: 14px; color: #6b7280; margin-left: 5px;">${t.matchScore}</span>
+        </div>
+
+        <!-- Description Card -->
+        <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <p style="font-size: 15px; line-height: 1.6; color: #374151; margin: 0;">
+                "${currentResult.desc[currentLang]}"
+            </p>
+
+            ${runnerUps.length > 0 ? `
+            <!-- Runner-ups -->
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                <div style="font-size: 12px; color: #6b7280; font-weight: 600; margin-bottom: 12px; text-align: center;">${t.runnersUp}</div>
+                <div style="display: flex; justify-content: center; gap: 40px;">
+                    ${runnerUps.map(([key, score]) => {
+                        const cat = categories[key];
+                        const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
+                        return `
+                            <div style="text-align: center;">
+                                <div style="font-size: 40px; margin-bottom: 5px;">${cat.icon}</div>
+                                <div style="font-size: 13px; color: #4b5563;">${cat.name[currentLang].split(' ')[0]}</div>
+                                <div style="font-size: 18px; font-weight: 700; color: ${getColorHex(cat.colorClass)};">${pct}%</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            ` : ''}
+        </div>
+
+        <!-- Watermark -->
+        <div style="text-align: center; margin-top: 20px;">
+            <span style="display: inline-block; font-size: 14px; color: #003087; font-weight: 600; padding: 10px 20px; background: rgba(0, 48, 135, 0.1); border-radius: 20px;">thalay.eu/shade2569</span>
         </div>
     `;
-    clone.insertBefore(header.firstChild, clone.firstChild);
 
-    // Enhance watermark
-    const watermark = clone.querySelector('.watermark');
-    if (watermark) {
-        watermark.style.cssText = `
-            margin-top: 25px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #003087;
-            font-weight: bold;
-            padding: 10px 20px;
-            background: rgba(0, 48, 135, 0.1);
-            border-radius: 25px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
-        `;
-    }
-
-    // Remove buttons from screenshot
-    const buttons = clone.querySelectorAll('button');
-    buttons.forEach(btn => btn.remove());
-
-    document.body.appendChild(clone);
+    document.body.appendChild(container);
 
     try {
-        // Use html2canvas if available, otherwise fallback
         if (typeof html2canvas !== 'undefined') {
-            const canvas = await html2canvas(clone, {
+            const canvas = await html2canvas(container, {
                 scale: 2,
-                backgroundColor: '#f8fafc',
-                useCORS: true
+                backgroundColor: '#f0f4f8',
+                useCORS: true,
+                logging: false
             });
 
             // Download image
@@ -974,7 +1011,7 @@ async function captureAndShare() {
             }
         } else {
             // Fallback: Copy result text
-            const text = `🎯 ผลการวิเคราะห์: ${currentResult.name.th}\n📊 ตรงกับฉัน ${Math.round((maxScore / totalScore) * 100)}%\n\n✨ มาลองดูสิว่าคุณคือเฉดไหน?\n📍 thalay.eu/shade2569`;
+            const text = `🎯 ผลการวิเคราะห์: ${currentResult.name.th}\n📊 ตรงกับฉัน ${matchPercent}%\n\n✨ มาลองดูสิว่าคุณคือเฉดไหน?\n📍 thalay.eu/shade2569`;
             await navigator.clipboard.writeText(text);
             alert('คัดลอกผลลัพธ์แล้ว! วางเพื่อแชร์ได้เลย');
         }
@@ -982,8 +1019,28 @@ async function captureAndShare() {
         console.error('Screenshot error:', error);
         alert('ไม่สามารถบันทึกรูปได้ กรุณาลองใหม่อีกครั้ง');
     } finally {
-        document.body.removeChild(clone);
+        document.body.removeChild(container);
     }
+}
+
+// Helper function to get color hex from Tailwind class
+function getColorHex(colorClass) {
+    const colorMap = {
+        'bg-red-700': '#b91c1c',
+        'bg-pink-500': '#ec4899',
+        'bg-red-500': '#ef4444',
+        'bg-purple-600': '#9333ea',
+        'bg-orange-500': '#f97316',
+        'bg-blue-600': '#2563eb',
+        'bg-sky-400': '#38bdf8',
+        'bg-orange-400': '#fb923c',
+        'bg-orange-600': '#ea580c',
+        'bg-yellow-400': '#facc15',
+        'bg-yellow-600': '#ca8a04',
+        'bg-green-700': '#15803d',
+        'bg-gray-400': '#9ca3af'
+    };
+    return colorMap[colorClass] || '#374151';
 }
 
 function goBackFromResult() {
