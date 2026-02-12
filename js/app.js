@@ -400,10 +400,29 @@ const questions = [
 ];
 
 // ============================================
+// Utility Functions
+// ============================================
+
+/**
+ * Fisher-Yates shuffle algorithm for randomizing array order
+ * @param {Array} array - Array to shuffle
+ * @returns {Array} - New shuffled array (does not modify original)
+ */
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// ============================================
 // State Management
 // ============================================
 
 let currentQuestionIndex = 0;
+let shuffledChoices = []; // Store shuffled choice indices for current question
 let scores = {};
 function resetScores() {
     scores = {};
@@ -643,6 +662,10 @@ function renderQuestion() {
     const progress = (currentQuestionIndex / questions.length) * 100;
     const t = translations[currentLang];
 
+    // Shuffle choices for fairness - create array of indices and shuffle them
+    const choiceIndices = q.choices.map((_, i) => i);
+    shuffledChoices = shuffleArray(choiceIndices);
+
     let html = `
         <div class="w-full h-full flex flex-col fade-in">
             <div class="flex justify-between items-end mb-2">
@@ -666,9 +689,11 @@ function renderQuestion() {
             <div class="space-y-3 flex-1 overflow-y-auto pb-4 custom-scrollbar">
     `;
 
-    q.choices.forEach((choice, index) => {
+    // Render choices in shuffled order
+    shuffledChoices.forEach((originalIndex, displayIndex) => {
+        const choice = q.choices[originalIndex];
         html += `
-            <button onclick="selectChoice(${index})" class="choice-btn w-full text-left group">
+            <button onclick="selectChoice(${displayIndex})" class="choice-btn w-full text-left group">
                 <span class="font-medium text-lg group-hover:text-[#003087] transition-colors">${choice.text[currentLang]}</span>
             </button>
         `;
@@ -678,15 +703,18 @@ function renderQuestion() {
     contentDiv.innerHTML = html;
 }
 
-function selectChoice(choiceIndex) {
+function selectChoice(displayIndex) {
     sound.playBeep();
     const q = questions[currentQuestionIndex];
-    const selectedChoice = q.choices[choiceIndex];
+
+    // Map display index back to original choice index
+    const originalIndex = shuffledChoices[displayIndex];
+    const selectedChoice = q.choices[originalIndex];
 
     // Store this answer for potential back navigation
     answerHistory.push({
         questionIndex: currentQuestionIndex,
-        choiceIndex: choiceIndex,
+        choiceIndex: originalIndex, // Store original index
         score: { ...selectedChoice.score }
     });
 
