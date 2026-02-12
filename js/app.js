@@ -533,8 +533,8 @@ async function getAnswerStats(questionId = null) {
 
 async function getGlobalStats() {
     try {
-        // Get stats from D1 database via Pages Function
-        const response = await fetch('/api/stats');
+        // Get stats from D1 database via Pages Function with cache-busting
+        const response = await fetch(`/api/stats?t=${Date.now()}`);
         if (response.ok) {
             const stats = await response.json();
             // Merge with localStorage for any unsaved local results

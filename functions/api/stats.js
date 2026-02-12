@@ -29,7 +29,7 @@ export async function onRequest(context) {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=60' // Cache for 1 minute
+        'Cache-Control': 'public, max-age=10' // Cache for 10 seconds for near real-time stats
       }
     });
 
