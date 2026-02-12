@@ -92,7 +92,7 @@ const translations = {
         runnersUp: "เฉดที่ใกล้เคียง",
         totalPlayers: "ผู้เล่นทั้งหมด",
         edit: "ย้อนแก้ไข",
-        stats: "ดูผลลัพธ์จากผู้เล่น",
+        stats: "ดูผลลัพธ์จากผู้เล่นอื่น",
         playAgain: "เล่นใหม่อีกครั้ง",
         globalStatsTitle: "ผลลัพธ์จากผู้เล่น",
         backHome: "กลับหน้าหลัก",
@@ -805,7 +805,7 @@ async function showResult() {
     if (sortedScores.length > 1) {
         const runnerUps = sortedScores.slice(1, 3); // 2nd and 3rd place
         runnersUpHtml = `
-            <div class="runners-up mt-5 pt-4 border-t border-gray-200 w-full">
+            <div class="runners-up mt-8 pt-6 border-t border-gray-200 w-full">
                 <div class="text-sm font-semibold text-gray-500 mb-4">${t.runnersUp}</div>
                 <div class="flex justify-center items-start gap-12">
                     ${runnerUps.map(([key, score]) => {
