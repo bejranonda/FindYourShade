@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.13.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.14.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -123,6 +123,10 @@ wrangler d1 create DB --name=findyourshade-db
 wrangler d1 execute DB --remote --file=schema.sql
 ```
 
+This creates two tables:
+- `stats` - Stores final quiz results
+- `answers` - Stores individual answer choices for analytics
+
 ### 3. Configure Binding
 
 The database is pre-configured in `wrangler.toml`:
@@ -179,6 +183,67 @@ Retrieve global statistics.
 
 **Caching:** Response is cached for 60 seconds.
 
+### POST /api/answer
+
+Save an individual answer choice to the database for detailed analytics.
+
+**Request:**
+```json
+{
+  "questionId": 0,
+  "choiceIndex": 3,
+  "sessionId": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+}
+```
+
+**Parameters:**
+- `questionId` (integer): Question number (0-7)
+- `choiceIndex` (integer): Selected choice index (0-9)
+- `sessionId` (string): UUID v4 identifying the quiz session
+
+**Response:**
+```json
+{
+  "success": true
+}
+```
+
+### GET /api/answers
+
+Retrieve answer statistics for analytics.
+
+**Get all question stats:**
+```
+GET /api/answers
+```
+
+**Response:**
+```json
+{
+  "0": { "0": 150, "1": 89, "2": 45 },
+  "1": { "0": 120, "1": 200, "3": 50 }
+}
+```
+
+**Get specific question stats:**
+```
+GET /api/answers?questionId=0
+```
+
+**Response:**
+```json
+{
+  "questionId": 0,
+  "choices": {
+    "0": 150,
+    "1": 89,
+    "2": 45
+  }
+}
+```
+
+**Caching:** Response is cached for 60 seconds.
+
 ---
 
 ## 🛠️ Tech Stack
@@ -210,7 +275,9 @@ FindYourShade/
 ├── functions/
 │   └── api/
 │       ├── save.js         # POST /api/save - Save result to D1
-│       └── stats.js        # GET /api/stats - Get stats from D1
+│       ├── stats.js        # GET /api/stats - Get stats from D1
+│       ├── answer.js       # POST /api/answer - Save individual answer
+│       └── answers.js      # GET /api/answers - Get answer statistics
 ├── schema.sql              # D1 database schema
 ├── package.json            # Dependencies and build scripts
 ├── tailwind.config.js      # Tailwind configuration
@@ -233,6 +300,14 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.14.0 (2025-02-12)
+- **New:** Individual answer tracking - saves each choice to D1 database
+- **New:** Session ID generation for tracking complete quiz sessions
+- **New:** `/api/answer` endpoint - POST to save individual answers
+- **New:** `/api/answers` endpoint - GET answer statistics per question
+- **Database:** Added `answers` table with session tracking
+- **Analytics:** Foundation for detailed question-level statistics
 
 ### v3.13.0 (2025-02-12)
 - **New:** Share button with subtle gradient animation

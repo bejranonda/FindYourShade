@@ -21,6 +21,24 @@ CREATE TABLE IF NOT EXISTS stats (
 CREATE INDEX IF NOT EXISTS idx_category_id ON stats(category_id);
 
 -- ============================================
+-- Answers table: stores individual answer choices per question
+-- Each row represents one answer from one quiz session
+-- ============================================
+CREATE TABLE IF NOT EXISTS answers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id TEXT NOT NULL,      -- Unique identifier for each quiz session (UUID)
+    question_id INTEGER NOT NULL,  -- Question number (0-7)
+    choice_index INTEGER NOT NULL, -- Index of selected choice (0-9)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index for faster queries by session
+CREATE INDEX IF NOT EXISTS idx_session_id ON answers(session_id);
+
+-- Index for faster aggregation queries by question and choice
+CREATE INDEX IF NOT EXISTS idx_question_choice ON answers(question_id, choice_index);
+
+-- ============================================
 -- Valid category_id values:
 -- ============================================
 -- NAM_MAK       - แดงน้ำหมาก (Traditionalist Red)

@@ -98,7 +98,7 @@ const translations = {
         backHome: "กลับหน้าหลัก",
         share: "แชร์ผลลัพธ์",
         screenshot: "บันทึกรูปผลลัพธ์",
-        footerRelease: "Release: v3.13.0",
+        footerRelease: "Release: v3.14.0",
         footerSequel: "ภาคต่อของ Sim Thailand 2569"
     },
     en: {
@@ -125,7 +125,7 @@ const translations = {
         backHome: "Back to Home",
         share: "Share Result",
         screenshot: "Save Result Image",
-        footerRelease: "Release: v3.13.0",
+        footerRelease: "Release: v3.14.0",
         footerSequel: "Sequel to Sim Thailand 2569"
     }
 };
@@ -432,6 +432,17 @@ function shuffleArray(array) {
 let currentQuestionIndex = 0;
 let shuffledChoices = []; // Store shuffled choice indices for current question
 let scores = {};
+
+// Generate unique session ID for this quiz attempt
+let currentSessionId = null;
+function generateSessionId() {
+    // Generate a simple UUID v4
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
 function resetScores() {
     scores = {};
     Object.keys(categories).forEach(k => scores[k] = 0);
@@ -471,6 +482,52 @@ async function saveResultToDatabase(category) {
         const stats = JSON.parse(localStorage.getItem('globalStats') || '{}');
         stats[category.id] = (stats[category.id] || 0) + 1;
         localStorage.setItem('globalStats', JSON.stringify(stats));
+    }
+}
+
+// Save individual answer to database
+async function saveAnswerToDatabase(questionId, choiceIndex) {
+    if (!currentSessionId) {
+        currentSessionId = generateSessionId();
+    }
+
+    console.log(`Saving answer: Q${questionId + 1} = Choice ${choiceIndex}`);
+
+    try {
+        const response = await fetch('/api/answer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                questionId: questionId,
+                choiceIndex: choiceIndex,
+                sessionId: currentSessionId
+            })
+        });
+
+        if (response.ok) {
+            console.log("Answer saved successfully");
+        } else {
+            console.warn("Failed to save answer to database");
+        }
+    } catch (e) {
+        console.error("Failed to save answer", e);
+    }
+}
+
+// Get answer statistics from database
+async function getAnswerStats(questionId = null) {
+    try {
+        const url = questionId !== null
+            ? `/api/answers?questionId=${questionId}`
+            : '/api/answers';
+        const response = await fetch(url);
+        if (response.ok) {
+            return await response.json();
+        }
+        return {};
+    } catch (e) {
+        console.error("Failed to fetch answer stats", e);
+        return {};
     }
 }
 
@@ -642,6 +699,7 @@ function renderStartScreen() {
     resetScores();
     currentResult = null;
     answerHistory = []; // Clear answer history
+    currentSessionId = null; // Reset session for new quiz
 
     const t = translations[currentLang];
 
@@ -666,6 +724,9 @@ function renderStartScreen() {
 
 function startGame() {
     sound.playSelect();
+    // Generate new session ID for this quiz attempt
+    currentSessionId = generateSessionId();
+    console.log("Starting new quiz session:", currentSessionId);
     renderQuestion();
 }
 
@@ -729,6 +790,9 @@ function selectChoice(displayIndex) {
         choiceIndex: originalIndex, // Store original index
         score: { ...selectedChoice.score }
     });
+
+    // Save answer to database (fire and forget)
+    saveAnswerToDatabase(currentQuestionIndex, originalIndex);
 
     // Add scores
     for (const [key, value] of Object.entries(selectedChoice.score)) {
@@ -809,16 +873,16 @@ async function showResult() {
                 <div class="text-sm font-semibold text-gray-500 mb-4">${t.runnersUp}</div>
                 <div class="flex justify-center items-start gap-12">
                     ${runnerUps.map(([key, score]) => {
-                        const cat = categories[key];
-                        const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
-                        return `
+            const cat = categories[key];
+            const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
+            return `
                             <div class="text-center flex flex-col items-center" style="min-width: 80px;">
                                 <div class="text-5xl mb-2">${cat.icon}</div>
                                 <div class="text-sm text-gray-600 font-medium mb-1">${cat.name[currentLang].split(' ')[0]}</div>
                                 <div class="text-xl font-bold ${cat.textClass}">${pct}%</div>
                             </div>
                         `;
-                    }).join('')}
+        }).join('')}
                 </div>
             </div>
         `;
@@ -956,16 +1020,16 @@ async function captureAndShare() {
                 <div style="font-size: 12px; color: #6b7280; font-weight: 600; margin-bottom: 12px; text-align: center;">${t.runnersUp}</div>
                 <div style="display: flex; justify-content: center; gap: 40px;">
                     ${runnerUps.map(([key, score]) => {
-                        const cat = categories[key];
-                        const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
-                        return `
+        const cat = categories[key];
+        const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
+        return `
                             <div style="text-align: center;">
                                 <div style="font-size: 40px; margin-bottom: 5px;">${cat.icon}</div>
                                 <div style="font-size: 13px; color: #4b5563;">${cat.name[currentLang].split(' ')[0]}</div>
                                 <div style="font-size: 18px; font-weight: 700; color: ${getColorHex(cat.colorClass)};">${pct}%</div>
                             </div>
                         `;
-                    }).join('')}
+    }).join('')}
                 </div>
             </div>
             ` : ''}
@@ -1069,7 +1133,7 @@ async function showStats() {
     let html = `
         <div class="w-full h-full flex flex-col fade-in font-['Kanit']">
             <h2 class="text-xl font-bold text-[#003087] mb-2 text-center">📊 ${t.globalStatsTitle}</h2>
-            <div class="text-center" style="margin-bottom: 32px;">
+            <div class="text-center" style="margin-bottom: 28px;">
                 <span class="inline-flex items-center px-4 py-2 bg-[#003087]/10 rounded-full">
                     <span class="text-gray-600 text-sm">👥 ${t.totalPlayers}:</span>
                     <span class="text-[#003087] font-bold text-lg ml-2">${total.toLocaleString()}</span>
