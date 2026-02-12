@@ -411,38 +411,25 @@ body {
     z-index: -1;
 }
 
-/* Share Button - Clean & Minimal */
+/* Share Button - Clean with subtle gradient */
 .share-btn {
     position: relative;
-    background: #003087 !important;
+    background: linear-gradient(135deg, #003087 0%, #1a4db8 50%, #003087 100%) !important;
+    background-size: 200% 200%;
     color: white !important;
-    border: 2px solid #003087;
+    border: none;
     box-shadow: 0 2px 8px rgba(0, 48, 135, 0.25);
     transition: all 0.3s ease;
+    animation: gradient-move 4s ease infinite;
+}
+
+@keyframes gradient-move {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .share-btn:hover {
-    background: #002466 !important;
-    border-color: #002466;
-    box-shadow: 0 4px 12px rgba(0, 48, 135, 0.35);
+    box-shadow: 0 4px 16px rgba(0, 48, 135, 0.4);
     transform: translateY(-2px);
-}
-
-/* Subtle attention pulse */
-.share-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: inherit;
-    box-shadow: 0 0 0 0 rgba(0, 48, 135, 0.4);
-    animation: subtle-pulse 3s ease-in-out infinite;
-    pointer-events: none;
-}
-
-@keyframes subtle-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 48, 135, 0); }
-    50% { box-shadow: 0 0 0 4px rgba(0, 48, 135, 0.2); }
 }
