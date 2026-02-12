@@ -411,49 +411,25 @@ body {
     z-index: -1;
 }
 
-/* Share Button - Eye-catching Design */
+/* Share Button - Clean & Minimal */
 .share-btn {
     position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 25%, #FE6B8B 50%, #FF8E53 75%, #FF6B6B 100%) !important;
-    background-size: 300% 300%;
-    animation: gradient-flow 4s ease infinite;
-    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5);
-    border: none;
+    background: #003087 !important;
     color: white !important;
+    border: 2px solid #003087;
+    box-shadow: 0 2px 8px rgba(0, 48, 135, 0.25);
+    transition: all 0.3s ease;
 }
 
-@keyframes gradient-flow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+.share-btn:hover {
+    background: #002466 !important;
+    border-color: #002466;
+    box-shadow: 0 4px 12px rgba(0, 48, 135, 0.35);
+    transform: translateY(-2px);
 }
 
-/* Shimmer effect */
+/* Subtle attention pulse */
 .share-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.4),
-        transparent
-    );
-    animation: shimmer 2.5s infinite;
-    transform: skewX(-20deg);
-}
-
-@keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 200%; }
-}
-
-/* Pulse glow */
-.share-btn::after {
     content: '';
     position: absolute;
     top: 0;
@@ -461,17 +437,12 @@ body {
     right: 0;
     bottom: 0;
     border-radius: inherit;
-    box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
-    animation: pulse-glow 2s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(0, 48, 135, 0.4);
+    animation: subtle-pulse 3s ease-in-out infinite;
     pointer-events: none;
 }
 
-@keyframes pulse-glow {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.02); }
-}
-
-.share-btn:hover {
-    transform: scale(1.05) !important;
-    box-shadow: 0 6px 30px rgba(255, 107, 107, 0.7) !important;
+@keyframes subtle-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 48, 135, 0); }
+    50% { box-shadow: 0 0 0 4px rgba(0, 48, 135, 0.2); }
 }
