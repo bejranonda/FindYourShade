@@ -1,7 +1,14 @@
-# Cloudflare Pages Redirects
+# ============================================
+# Cloudflare Pages Redirects Configuration
+# ============================================
+# This file configures URL redirects and rewrites.
+#
+# Documentation: https://developers.cloudflare.com/pages/configuration/redirects/
+# ============================================
 
-# Redirect index.html to root
+# Redirect index.html to root URL (clean URLs)
 /index.html /
 
-# Custom 404 page (optional - falls back to index.html for SPA behavior)
+# SPA fallback: Redirect all 404s to index.html
+# This allows client-side routing to handle unknown paths
 /* /index.html 404

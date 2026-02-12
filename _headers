@@ -1,24 +1,37 @@
-# Security Headers for Cloudflare Pages
+# ============================================
+# Cloudflare Pages Headers Configuration
+# ============================================
+# This file configures HTTP headers for security
+# and caching on Cloudflare Pages.
+#
+# Documentation: https://developers.cloudflare.com/pages/configuration/headers/
+# ============================================
+
+# Global security headers for all routes
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Access-Control-Allow-Origin: *
 
-  # Cache static assets for 1 year
+# ============================================
+# Cache Configuration
+# ============================================
+
+# Static assets - cache for 1 year (immutable)
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# CSS files - cache for 10 minutes
 /css/*
   Cache-Control: public, max-age=600
 
+# JavaScript files - cache for 10 minutes
 /js/*
   Cache-Control: public, max-age=600
 
-# Cache HTML for 1 hour
+# HTML pages - cache for 1 hour
 /*.html
   Cache-Control: public, max-age=3600
-
-# Enable CORS for fonts
-  Access-Control-Allow-Origin: *

@@ -1,11 +1,26 @@
-# Cloudflare Pages Configuration
+# ============================================
+# Cloudflare Pages Configuration (wrangler.toml)
+# ============================================
+# This file configures the Cloudflare Pages deployment
+# and D1 database binding for global statistics.
+#
 # Documentation: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+# ============================================
 
+# Project name (must match Cloudflare Pages project)
 name = "findyourshade"
+
+# Cloudflare compatibility date
 compatibility_date = "2024-01-01"
+
+# Build output directory for Pages deployment
 pages_build_output_dir = "."
 
+# ============================================
 # D1 Database Binding
+# ============================================
+# Binds the D1 database to the "DB" variable in Pages Functions
+# Access via: env.DB in functions/api/*.js
 [[d1_databases]]
 binding = "DB"
 database_name = "DB"

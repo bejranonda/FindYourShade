@@ -1,11 +1,28 @@
 {
   "name": "findyourshade",
   "version": "3.7.0",
-  "description": "Thai Political Shade Quiz",
+  "description": "Thai Political Shade Quiz - Discover your political shade in Thailand's political landscape",
+  "main": "index.html",
   "scripts": {
     "build:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --minify",
     "watch:css": "tailwindcss -i ./css/input.css -o ./css/tailwind.css --watch"
   },
+  "keywords": [
+    "thai-politics",
+    "quiz",
+    "political-quiz",
+    "thailand",
+    "interactive",
+    "cloudflare-pages",
+    "tailwindcss"
+  ],
+  "author": "FindYourShade Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bejranonda/FindYourShade.git"
+  },
+  "homepage": "https://findyourshade.autobahn.bot/",
   "devDependencies": {
     "tailwindcss": "^3.4.17"
   }
