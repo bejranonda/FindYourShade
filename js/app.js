@@ -98,7 +98,7 @@ const translations = {
         backHome: "กลับหน้าหลัก",
         share: "แชร์ผลลัพธ์",
         screenshot: "บันทึกรูปผลลัพธ์",
-        footerRelease: "Release: v3.16.0",
+        footerRelease: "Release: v3.17.0",
         footerSequel: "ภาคต่อของ Sim Thailand 2569"
     },
     en: {
@@ -125,7 +125,7 @@ const translations = {
         backHome: "Back to Home",
         share: "Share Result",
         screenshot: "Save Result Image",
-        footerRelease: "Release: v3.16.0",
+        footerRelease: "Release: v3.17.0",
         footerSequel: "Sequel to Sim Thailand 2569"
     }
 };
@@ -314,13 +314,14 @@ const questions = [
             en: "How do you feel when someone criticizes your 'Spiritual Leader'?"
         },
         choices: [
-            { text: { th: "ยอมไม่ได้! ใครด่มาด่ากลับไม่โกง พ่อก็คือพ่อ!", en: "Unacceptable! I'll curse back. Father is Father!" }, score: { ORANGE_FAN: 3, NAM_MAK: 3 } },
+            { text: { th: "ยอมไม่ได้! เคยช่วยพวกเราไว้ต้องตอบแทน พ่อก็คือพ่อ!", en: "Unacceptable! They helped us before, must pay back. Father is Father!" }, score: { NAM_MAK: 3 } },
+            { text: { th: "ยอมไม่ได้! หลักการนี้ถูกต้อง ต้องปกป้องให้ถึงที่สุด!", en: "Unacceptable! These principles are right, must protect them to the end!" }, score: { ORANGE_FAN: 3 } },
             { text: { th: "รับฟัง วิเคราะห์ด้วยเหตุผล แต่ก็เตรียมข้อมูลไปแย้งกลับแบบผู้ดี", en: "Listen, analyze with reason, but prepare data to politely counter." }, score: { ORANGE_ACADEMIC: 3, SKY_BLUE: 2 } },
             { text: { th: "ยิ้มอ่อน จิบชา คิดในใจว่า 'พวกเธอไม่เข้าใจเกมหรอก'", en: "Smirk, sip tea, thinking 'You don't understand the game'." }, score: { MADAM: 3, BLUE: 1 } },
             { text: { th: "โกรธมาก! พวกนี้ไม่รู้จักที่ต่ำที่สูง ต้องจับให้หมด!", en: "Furious! They don't know their place. Arrest them all!" }, score: { YELLOW_ROYALIST: 3, GREEN: 2 } },
             { text: { th: "เฉยๆ ใครทำผิดก็ว่าไปตามผิด เน้นกติกาบ้านเมือง", en: "Indifferent. Wrong is wrong, focus on the rules." }, score: { YELLOW_CLASSIC: 2, SKY_BLUE: 2 } },
             { text: { th: "ไม่สนใจ ใครจะด่าใครก็เรื่องของเขา ขอแค่หุ้นไม่ตก งานไม่สะดุดพอ", en: "Don't care. As long as stocks don't drop and work isn't interrupted." }, score: { WHITE: 3 } },
-            { text: { th: "ฟังทุกฝ่าย พยายามเข้าใจ แม้ไม่เห็นด้วยก็ไม่ทะเลาะ เชื่อว่าเปลี่ยนได้ด้วยเหตุผล", en: "Listen to all sides, try to understand, don't argue. Change comes with reason." }, score: { NOM_PHONG: 3, ORANGE: 1 } },
+            { text: { th: "ฟังทุกฝ่าย พยายามเข้าใจ แม้ไม่เห็นด้วยก็ไม่ทะเลาะ เชื่อว่าเปลี่ยนได้ด้วยเหตุผล", en: "Listen to all sides, try to understand, don't argue. Change comes with reason." }, score: { ORANGE: 3, NOM_PHONG: 1 } },
             { text: { th: "โพสต์คลิปตอบโต้อย่างเท่ๆ พร้อมเรียกยอดวิว", en: "Post a cool rebuttal clip to boost views." }, score: { DARA: 3, ORANGE_FAN: 1 } }
         ]
     },
@@ -358,18 +359,19 @@ const questions = [
     },
     {
         q: {
-            th: "มองเพื่อนบ้านสีส้ม (พรรคก้าวไกล/ประชาชน) ยังไง?",
-            en: "How do you view the Orange neighbors (Move Forward/People's Party)?"
+            th: "เวลาได้ยินกระแสเรียกร้อง 'ปฏิรูป-เปลี่ยนแปลง' ในประเทศ คุณรู้สึกยังไง?",
+            en: "How do you feel when you hear calls for 'reform-change' in the country?"
         },
         choices: [
             { text: { th: "พวกเด็กวานซืน! ก้าวร้าว! ไม่รู้จักที่ต่ำที่สูง!", en: "Brats! Aggressive! Don't know their place!" }, score: { NAM_MAK: 1, YELLOW_CLASSIC: 2, GREEN: 3 } },
             { text: { th: "อันตราย! ล้มล้าง! เนรคุณแผ่นดิน! (รับไม่ได้อย่างแรง)", en: "Dangerous! Overthrowers! Ungrateful! (Totally unacceptable)" }, score: { YELLOW_ROYALIST: 3, GREEN: 3 } },
             { text: { th: "คือความหวังเดียวของการเปลี่ยนแปลงโครงสร้างประเทศ!", en: "The only hope for structural change in the country!" }, score: { ORANGE_ACADEMIC: 3, ORANGE_FAN: 3 } },
             { text: { th: "ก็ดีนะ มีไฟ แต่อยากให้ลดความสุดโต่งลงหน่อย (พร้อมร่วมงานถ้าจำเป็น)", en: "Good energy, but should tone down the extremism (ready to work if needed)." }, score: { SKY_BLUE: 3, MADAM: 2 } },
-            { text: { th: "เฉยๆ เหมือนพรรคอื่นๆ ถ้ามีผลประโยชน์ร่วมกันก็คุยได้", en: "Indifferent like others. If interests align, we can talk." }, score: { BLUE: 3 } },
+            { text: { th: "เฉยๆ ถ้ามีผลประโยชน์ร่วมกันก็คุยได้ ไม่มีอะไรแบ่งข้าง", en: "Indifferent. If interests align, we can talk. No sides." }, score: { BLUE: 3 } },
             { text: { th: "ไม่ค่อยชอบที่เสียงดัง แต่ก็เข้าใจว่าเป็นยุคของเขา", en: "Don't like the noise, but understand it's their era." }, score: { WHITE: 2 } },
-            { text: { th: "เห็นด้วยกับหลายนโยบาย แต่ไม่ชอบสไตล์การสื่อสาร อยากให้นุ่มกว่านี้", en: "Agree with many policies, but dislike the communication style. Wish it were softer." }, score: { NOM_PHONG: 2, ORANGE: 3 } },
-            { text: { th: "ก็ดี แต่จริงๆ ฝั่งแดงก็ทำได้เหมือนกัน แค่ไม่ได้โปรโมตดี", en: "They're fine, but the Red side can do the same, just not well promoted." }, score: { NAM_MAK: 2, MADAM: 2 } }
+            { text: { th: "เห็นด้วยกับหลายประเด็น แต่ไม่ชอบสไตล์การสื่อสาร อยากให้นุ่มกว่านี้", en: "Agree with many points, but dislike the communication style. Wish it were softer." }, score: { NOM_PHONG: 2, ORANGE: 3 } },
+            { text: { th: "ก็ดี แต่จริงๆ ฝั่งเราก็เคยทำอะไรแบบนี้มาก่อน", en: "It's fine, but our side has done similar things before." }, score: { NAM_MAK: 2, MADAM: 2 } },
+            { text: { th: "ก็ดี แต่ต้องมีเซเลบช่วยประกาศถึงจะดัง!", en: "Good, but need celebs to help announce it to be loud!" }, score: { DARA: 2, MADAM: 1 } }
         ]
     },
     {
@@ -385,7 +387,7 @@ const questions = [
             { text: { th: "เรียกร้องให้ใช้กฎหมายเด็ดขาดจัดการพวกป่วนเมือง", en: "Demand strict laws to deal with troublemakers." }, score: { GREEN: 3, YELLOW_ROYALIST: 2 } },
             { text: { th: "เลื่อนผ่าน... ดราม่ากินไม่ได้ เอาเวลาไปหาของอร่อยกินดีกว่า", en: "Scroll past... Drama isn't edible. Find good food instead." }, score: { WHITE: 3 } },
             { text: { th: "อ่านทั้งสองฝ่าย พยายามเข้าใจว่าทำไมแต่ละคนถึงคิดแบบนั้น", en: "Read both sides, try to understand why each person thinks that way." }, score: { NOM_PHONG: 3, SKY_BLUE: 1 } },
-            { text: { th: "โพสต์สรุปประเด็นอย่างเท่ๆ เน้นได้ยอด engagement แต่ก็ไม่ได้เลือกข้าง", en: "Post a cool summary for engagement, without taking sides." }, score: { DARA: 2, ORANGE: 2 } }
+            { text: { th: "โพสต์สรุปประเด็นอย่างเท่ๆ เน้นได้ยอด engagement แต่ก็ไม่ได้เลือกข้าง", en: "Post a cool summary for engagement, without taking sides." }, score: { ORANGE: 3, DARA: 1 } }
         ]
     },
     {
@@ -402,7 +404,8 @@ const questions = [
             { text: { th: "ประชาธิปไตยระบบรัฐสภาที่เข้มแข็ง (แบบค่อยเป็นค่อยไป)", en: "Strong Parliamentary Democracy (Gradual approach)." }, score: { SKY_BLUE: 3 } },
             { text: { th: "มีความสุขกับชีวิตเรียบง่าย รวยๆ เฮงๆ สุขภาพแข็งแรง จบ", en: "Happy simple life, rich, lucky, healthy. Period." }, score: { WHITE: 3, MADAM: 1 } },
             { text: { th: "อยากเห็นทุกฝ่ายคุยกันได้ ไม่แบ่งสี ไม่เกลียดกัน ประเทศไปข้างหน้าด้วยกัน", en: "Wish all sides could talk, no divides, no hate, the country moves forward together." }, score: { NOM_PHONG: 2, ORANGE: 2, WHITE: 1 } },
-            { text: { th: "เน้นพัฒนาเศรษฐกิจ สร้างโอกาส ใครปกครองก็ได้ ขอให้เงินหมุน", en: "Focus on economy, create opportunities. Anyone can govern, just keep money flowing." }, score: { BLUE: 3, MADAM: 2 } }
+            { text: { th: "เน้นพัฒนาเศรษฐกิจ สร้างโอกาส ใครปกครองก็ได้ ขอให้เงินหมุน", en: "Focus on economy, create opportunities. Anyone can govern, just keep money flowing." }, score: { BLUE: 3, MADAM: 2 } },
+            { text: { th: "อยากเป็นกระบอกเสียงที่ดังที่สุด ให้คนทั่วประเทศได้ยินเรื่องราวของเรา!", en: "Be the loudest voice so the whole country hears our story!" }, score: { DARA: 3, ORANGE_FAN: 1 } }
         ]
     }
 ];

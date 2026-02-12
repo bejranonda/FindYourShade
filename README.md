@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.16.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.17.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -300,6 +300,16 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.17.0 (2025-02-12)
+- **Improved:** Better score balance for all 13 political shades
+- **Improved:** แดงดารา (DARA) max score increased from 15 to 20 (+5)
+- **Improved:** ส้มแอบเนียน (ORANGE) max score increased from 13 to 16 (+3)
+- **Improved:** Question 5 changed from party-specific to "reform-change" topic
+- **Improved:** Split Q2 answers to differentiate NAM_MAK vs ORANGE_FAN
+- **New:** Added `/api/clear-answers` endpoint for database maintenance
+- **Database:** Cleared old answers data to match new question structure
+- **Docs:** Added `scripts/clear-answers.sql` for manual database cleanup
 
 ### v3.16.0 (2025-02-12)
 - **New:** Normalized percentage calculation for fair cross-shade comparison
