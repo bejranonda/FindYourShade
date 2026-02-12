@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.15.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.16.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -300,6 +300,15 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.16.0 (2025-02-12)
+- **New:** Normalized percentage calculation for fair cross-shade comparison
+- **Improved:** Percentage now represents "how well you match this shade" on a comparable scale
+- **Fixed:** Runner-up percentages are now correctly ordered (highest first)
+- **Algorithm:** Uses average max possible score normalization to balance different shade opportunities
+  - Formula: `normalizedScore = score × (avgMax / maxPossible)`
+  - All shades can now achieve 100% with perfect answers
+  - Same percentage across different shades now represents comparable match levels
 
 ### v3.15.0 (2025-02-12)
 - **Improved:** Stats page now shows player count with percentage (e.g., "3,536 (62.1%)")

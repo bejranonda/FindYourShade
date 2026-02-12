@@ -98,7 +98,7 @@ const translations = {
         backHome: "กลับหน้าหลัก",
         share: "แชร์ผลลัพธ์",
         screenshot: "บันทึกรูปผลลัพธ์",
-        footerRelease: "Release: v3.15.0",
+        footerRelease: "Release: v3.16.0",
         footerSequel: "ภาคต่อของ Sim Thailand 2569"
     },
     en: {
@@ -125,7 +125,7 @@ const translations = {
         backHome: "Back to Home",
         share: "Share Result",
         screenshot: "Save Result Image",
-        footerRelease: "Release: v3.15.0",
+        footerRelease: "Release: v3.16.0",
         footerSequel: "Sequel to Sim Thailand 2569"
     }
 };
@@ -452,6 +452,36 @@ resetScores();
 let currentResult = null;
 let quizHistory = [];
 let answerHistory = []; // Track answers for back functionality
+
+// Pre-calculate maximum possible score for each shade
+let maxPossibleScores = {};
+let avgMaxPossible = 0; // Average max for normalization
+function calculateMaxPossibleScores() {
+    // Reset all max scores to 0
+    Object.keys(categories).forEach(k => maxPossibleScores[k] = 0);
+
+    // For each question, find the maximum score each shade can get
+    questions.forEach(q => {
+        Object.keys(categories).forEach(shadeKey => {
+            // Find the choice that gives the maximum score for this shade
+            let maxScoreForThisQuestion = 0;
+            q.choices.forEach(choice => {
+                if (choice.score && choice.score[shadeKey]) {
+                    maxScoreForThisQuestion = Math.max(maxScoreForThisQuestion, choice.score[shadeKey]);
+                }
+            });
+            maxPossibleScores[shadeKey] += maxScoreForThisQuestion;
+        });
+    });
+
+    // Calculate average max for normalization
+    const maxValues = Object.values(maxPossibleScores);
+    avgMaxPossible = maxValues.reduce((a, b) => a + b, 0) / maxValues.length;
+
+    console.log("Max possible scores:", maxPossibleScores);
+    console.log("Average max for normalization:", avgMaxPossible);
+}
+calculateMaxPossibleScores();
 
 // ============================================
 // Database (Cloudflare D1)
@@ -829,26 +859,27 @@ function goBack() {
 async function showResult() {
     sound.playWin();
 
-    // Calculate total score for percentage
-    let totalScore = 0;
-    let maxScore = -1;
-    let winnerKey = 'WHITE';
+    // Calculate normalized percentages for all shades and sort by percentage
+    // Formula: normalizedScore = score × (avgMax / maxPossible)
+    //          percentage = (normalizedScore / avgMax) × 100, capped at 100%
+    const shadePercentages = Object.entries(scores)
+        .map(([key, score]) => {
+            const maxPossible = maxPossibleScores[key] || 1;
+            const normalizer = avgMaxPossible / maxPossible;
+            const normalizedScore = score * normalizer;
+            const percentage = Math.min(Math.round((normalizedScore / avgMaxPossible) * 100), 100);
+            return { key, score, percentage };
+        })
+        .sort((a, b) => b.percentage - a.percentage);
 
-    for (const [key, value] of Object.entries(scores)) {
-        totalScore += value;
-        if (value > maxScore) {
-            maxScore = value;
-            winnerKey = key;
-        }
-    }
+    // Winner is the shade with highest percentage
+    const winner = shadePercentages[0];
+    const winnerKey = winner.key;
+    const matchPercent = winner.percentage;
 
-    // Calculate percentage match
-    const matchPercent = totalScore > 0 ? Math.round((maxScore / totalScore) * 100) : 100;
-
-    // Get sorted scores for runner-ups
-    const sortedScores = Object.entries(scores)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3); // Top 3
+    // Get top 3 for display (winner + 2 runner-ups)
+    const topShades = shadePercentages.slice(0, 3);
+    const runnerUps = topShades.slice(1, 3); // 2nd and 3rd place
 
     const result = categories[winnerKey];
     currentResult = result;
@@ -866,20 +897,18 @@ async function showResult() {
 
     // Build runner-ups HTML (skip the winner, show next 2)
     let runnersUpHtml = '';
-    if (sortedScores.length > 1) {
-        const runnerUps = sortedScores.slice(1, 3); // 2nd and 3rd place
+    if (runnerUps.length > 0) {
         runnersUpHtml = `
             <div class="runners-up w-full" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
                 <div class="text-sm font-semibold text-gray-500 mb-4">${t.runnersUp}</div>
                 <div class="flex justify-center items-start gap-12">
-                    ${runnerUps.map(([key, score]) => {
-            const cat = categories[key];
-            const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
+                    ${runnerUps.map(shade => {
+            const cat = categories[shade.key];
             return `
                             <div class="text-center flex flex-col items-center" style="min-width: 80px;">
                                 <div class="text-5xl mb-2">${cat.icon}</div>
                                 <div class="text-sm text-gray-600 font-medium mb-1">${cat.name[currentLang].split(' ')[0]}</div>
-                                <div class="text-xl font-bold ${cat.textClass}">${pct}%</div>
+                                <div class="text-xl font-bold ${cat.textClass}">${shade.percentage}%</div>
                             </div>
                         `;
         }).join('')}
@@ -950,20 +979,25 @@ async function captureAndShare() {
 
     const t = translations[currentLang];
 
-    // Calculate scores for display
-    let totalScore = 0;
-    let maxScore = 0;
-    for (const [key, value] of Object.entries(scores)) {
-        totalScore += value;
-        if (value > maxScore) maxScore = value;
-    }
-    const matchPercent = totalScore > 0 ? Math.round((maxScore / totalScore) * 100) : 100;
+    // Calculate normalized percentages for all shades and sort by percentage
+    // Formula: normalizedScore = score × (avgMax / maxPossible)
+    //          percentage = (normalizedScore / avgMax) × 100, capped at 100%
+    const shadePercentages = Object.entries(scores)
+        .map(([key, score]) => {
+            const maxPossible = maxPossibleScores[key] || 1;
+            const normalizer = avgMaxPossible / maxPossible;
+            const normalizedScore = score * normalizer;
+            const percentage = Math.min(Math.round((normalizedScore / avgMaxPossible) * 100), 100);
+            return { key, score, percentage };
+        })
+        .sort((a, b) => b.percentage - a.percentage);
 
-    // Get runner-ups
-    const sortedScores = Object.entries(scores)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3);
-    const runnerUps = sortedScores.slice(1, 3);
+    // Winner is the shade with highest percentage
+    const winner = shadePercentages[0];
+    const matchPercent = winner.percentage;
+
+    // Get runner-ups (2nd and 3rd place)
+    const runnerUps = shadePercentages.slice(1, 3);
 
     // Create a clean screenshot container
     const container = document.createElement('div');
@@ -1019,14 +1053,13 @@ async function captureAndShare() {
             <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
                 <div style="font-size: 12px; color: #6b7280; font-weight: 600; margin-bottom: 12px; text-align: center;">${t.runnersUp}</div>
                 <div style="display: flex; justify-content: center; gap: 40px;">
-                    ${runnerUps.map(([key, score]) => {
-        const cat = categories[key];
-        const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
+                    ${runnerUps.map(shade => {
+        const cat = categories[shade.key];
         return `
                             <div style="text-align: center;">
                                 <div style="font-size: 40px; margin-bottom: 5px;">${cat.icon}</div>
                                 <div style="font-size: 13px; color: #4b5563;">${cat.name[currentLang].split(' ')[0]}</div>
-                                <div style="font-size: 18px; font-weight: 700; color: ${getColorHex(cat.colorClass)};">${pct}%</div>
+                                <div style="font-size: 18px; font-weight: 700; color: ${getColorHex(cat.colorClass)};">${shade.percentage}%</div>
                             </div>
                         `;
     }).join('')}
