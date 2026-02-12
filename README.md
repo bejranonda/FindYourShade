@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.10.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.10.1-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -233,6 +233,10 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.10.1 (2025-02-12)
+- **Fixed:** Cache-busting version numbers for CSS/JS assets
+- Ensures color wheel animation loads correctly after deployment
 
 ### v3.10.0 (2025-02-12)
 - **Improved:** Better spacing between color wheel and title on start screen
