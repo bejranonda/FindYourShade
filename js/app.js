@@ -807,15 +807,15 @@ async function showResult() {
         runnersUpHtml = `
             <div class="runners-up mt-4 w-full">
                 <div class="text-xs font-semibold text-gray-400 mb-2">${t.runnersUp}</div>
-                <div class="flex justify-center gap-4">
+                <div class="flex justify-center gap-6">
                     ${runnerUps.map(([key, score]) => {
                         const cat = categories[key];
                         const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
                         return `
                             <div class="text-center">
-                                <div class="text-2xl">${cat.icon}</div>
-                                <div class="text-xs text-gray-500">${cat.name[currentLang].split(' ')[0]}</div>
-                                <div class="text-sm font-bold ${cat.textClass}">${pct}%</div>
+                                <div class="text-4xl mb-1">${cat.icon}</div>
+                                <div class="text-sm text-gray-600 font-medium">${cat.name[currentLang].split(' ')[0]}</div>
+                                <div class="text-lg font-bold ${cat.textClass}">${pct}%</div>
                             </div>
                         `;
                     }).join('')}
@@ -828,7 +828,7 @@ async function showResult() {
         <div id="result-content" class="w-full h-full flex flex-col items-center text-center scale-in overflow-y-auto pb-8 font-['Kanit']">
             <div class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-widest">${t.resultTitle}</div>
 
-            <div class="text-6xl mb-3 filter drop-shadow-md">${result.icon}</div>
+            <div class="text-8xl mb-3 filter drop-shadow-md">${result.icon}</div>
 
             <h2 class="text-2xl md:text-3xl font-black ${result.textClass} mb-1 leading-tight">
                 ${result.name[currentLang]}
@@ -852,8 +852,8 @@ async function showResult() {
             </div>
 
             <!-- Share Button -->
-            <button onclick="captureAndShare()" class="w-full mb-3 bg-gradient-to-r from-[#003087] to-[#0052cc] hover:from-[#002466] hover:to-[#003087] text-white py-4 rounded-lg shadow-lg font-bold transition-all transform hover:scale-[1.02]">
-                ${t.share}
+            <button onclick="captureAndShare()" class="share-btn w-full mb-3 py-4 rounded-lg shadow-lg font-bold transition-all transform hover:scale-[1.02]" style="background: linear-gradient(135deg, #003087 0%, #0052cc 100%); color: white;">
+                📸 ${t.share}
             </button>
 
             <div class="grid grid-cols-2 gap-3 w-full mb-4">
@@ -870,7 +870,7 @@ async function showResult() {
             </button>
 
             <!-- Watermark for screenshot -->
-            <div class="watermark mt-4 text-xs text-gray-400">
+            <div class="watermark mt-4 text-xs text-gray-400 text-center">
                 thalay.eu/shade2569
             </div>
         </div>
@@ -925,7 +925,14 @@ async function captureAndShare() {
             padding: 8px 15px;
             background: rgba(0, 48, 135, 0.1);
             border-radius: 20px;
+            text-align: center;
+            display: inline-block;
         `;
+        // Wrap in centering div
+        const centerDiv = document.createElement('div');
+        centerDiv.style.cssText = 'text-align: center; margin-top: 20px;';
+        watermark.parentNode.insertBefore(centerDiv, watermark);
+        centerDiv.appendChild(watermark);
     }
 
     // Remove buttons from screenshot
