@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.14.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.15.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -300,6 +300,12 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.15.0 (2025-02-12)
+- **Improved:** Stats page now shows player count with percentage (e.g., "3,536 (62.1%)")
+- **Improved:** Percentage displayed to 1 decimal place for better accuracy
+- **Fixed:** Stats API cache reduced from 60s to 10s for near real-time updates
+- **Fixed:** Added cache-busting to prevent stale stats display
 
 ### v3.14.0 (2025-02-12)
 - **New:** Individual answer tracking - saves each choice to D1 database
