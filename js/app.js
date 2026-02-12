@@ -639,16 +639,16 @@ function renderStartScreen() {
 
     contentDiv.innerHTML = `
         <div class="text-center w-full fade-in font-['Kanit']">
-            <div class="color-wheel-container" style="margin-bottom: 30px;">
+            <div class="color-wheel-container md:!w-[150px] md:!h-[150px]" style="margin-bottom: 30px;">
                 <div class="color-wheel-glow"></div>
                 <div class="color-wheel"></div>
                 <div class="wheel-pointer"></div>
             </div>
-            <h2 class="text-2xl font-bold text-[#003087] mb-2">${t.startTitle}</h2>
-            <p class="text-gray-500 mb-8 px-4 text-base leading-relaxed">
+            <h2 class="text-2xl md:text-3xl font-bold text-[#003087] mb-2 md:mb-3">${t.startTitle}</h2>
+            <p class="text-gray-500 mb-8 px-4 text-base md:text-lg md:leading-relaxed">
                 ${t.startDesc.replace('{count}', questions.length)}
             </p>
-            <button onclick="startGame()" class="w-full bg-[#003087] hover:bg-[#002466] text-white py-4 rounded-lg shadow-lg text-lg font-bold transition-all transform hover:scale-[1.02]">
+            <button onclick="startGame()" class="w-full bg-[#003087] hover:bg-[#002466] text-white py-4 rounded-lg shadow-lg text-lg md:text-xl font-bold transition-all transform hover:scale-[1.02]">
                 ${t.startBtn}
             </button>
         </div>
