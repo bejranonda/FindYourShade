@@ -852,7 +852,7 @@ async function showResult() {
             </div>
 
             <!-- Share Button -->
-            <button onclick="captureAndShare()" class="share-btn w-full mb-3 py-4 rounded-lg shadow-lg font-bold transition-all transform hover:scale-[1.02]" style="background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); color: white; animation: pulse-share 2s ease-in-out infinite;">
+            <button onclick="captureAndShare()" class="share-btn w-full mb-3 py-4 rounded-lg shadow-lg font-bold transition-all">
                 📸 ${t.share}
             </button>
 
