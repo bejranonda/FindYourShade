@@ -805,7 +805,7 @@ async function showResult() {
     if (sortedScores.length > 1) {
         const runnerUps = sortedScores.slice(1, 3); // 2nd and 3rd place
         runnersUpHtml = `
-            <div class="runners-up mt-8 pt-6 border-t border-gray-200 w-full">
+            <div class="runners-up w-full" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
                 <div class="text-sm font-semibold text-gray-500 mb-4">${t.runnersUp}</div>
                 <div class="flex justify-center items-start gap-12">
                     ${runnerUps.map(([key, score]) => {
@@ -852,7 +852,7 @@ async function showResult() {
             </div>
 
             <!-- Share Button -->
-            <button onclick="captureAndShare()" class="share-btn w-full mb-3 py-4 rounded-lg shadow-lg font-bold transition-all transform hover:scale-[1.02]" style="background: linear-gradient(135deg, #003087 0%, #0052cc 100%); color: white;">
+            <button onclick="captureAndShare()" class="share-btn w-full mb-3 py-4 rounded-lg shadow-lg font-bold transition-all transform hover:scale-[1.02]" style="background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); color: white; animation: pulse-share 2s ease-in-out infinite;">
                 📸 ${t.share}
             </button>
 
@@ -918,21 +918,22 @@ async function captureAndShare() {
     const watermark = clone.querySelector('.watermark');
     if (watermark) {
         watermark.style.cssText = `
-            margin-top: 20px;
-            font-size: 12px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 14px;
             color: #003087;
             font-weight: bold;
-            padding: 8px 15px;
+            padding: 10px 20px;
             background: rgba(0, 48, 135, 0.1);
-            border-radius: 20px;
+            border-radius: 25px;
             text-align: center;
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
         `;
-        // Wrap in centering div
-        const centerDiv = document.createElement('div');
-        centerDiv.style.cssText = 'text-align: center; margin-top: 20px;';
-        watermark.parentNode.insertBefore(centerDiv, watermark);
-        centerDiv.appendChild(watermark);
     }
 
     // Remove buttons from screenshot

@@ -410,3 +410,20 @@ body {
     filter: blur(15px);
     z-index: -1;
 }
+
+/* Share Button Pulse Animation */
+@keyframes pulse-share {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 6px 25px rgba(16, 185, 129, 0.6);
+        transform: scale(1.02);
+    }
+}
+
+.share-btn:hover {
+    animation: none;
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.7) !important;
+}
