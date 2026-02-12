@@ -639,7 +639,11 @@ function renderStartScreen() {
 
     contentDiv.innerHTML = `
         <div class="text-center w-full fade-in font-['Kanit']">
-            <div class="text-6xl mb-6 animate-bounce">⚖️</div>
+            <div class="color-wheel-container mb-6">
+                <div class="color-wheel-glow"></div>
+                <div class="color-wheel"></div>
+                <div class="wheel-pointer"></div>
+            </div>
             <h2 class="text-2xl font-bold text-[#003087] mb-2">${t.startTitle}</h2>
             <p class="text-gray-500 mb-8 px-4 text-base leading-relaxed">
                 ${t.startDesc.replace('{count}', questions.length)}

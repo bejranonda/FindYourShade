@@ -257,3 +257,113 @@ body {
         opacity: 0;
     }
 }
+
+/* Color Wheel Animation */
+.color-wheel-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+}
+
+.color-wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        #b91c1c 0deg 30deg,      /* Red - Nam Mak */
+        #ec4899 30deg 60deg,     /* Pink - Nom Phong */
+        #ef4444 60deg 90deg,     /* Red 500 - Madam */
+        #9333ea 90deg 120deg,    /* Purple - Dara */
+        #f97316 120deg 150deg,   /* Orange - Orange */
+        #ea580c 150deg 180deg,   /* Orange 600 - Orange Fan */
+        #fb923c 180deg 210deg,   /* Orange 400 - Academic */
+        #2563eb 210deg 240deg,   /* Blue */
+        #38bdf8 240deg 270deg,   /* Sky Blue */
+        #facc15 270deg 300deg,   /* Yellow - Classic */
+        #ca8a04 300deg 330deg,   /* Yellow 600 - Royalist */
+        #15803d 330deg 360deg    /* Green */
+    );
+    animation: spinWheel 4s linear infinite;
+    box-shadow:
+        0 0 20px rgba(0, 0, 0, 0.2),
+        inset 0 0 30px rgba(255, 255, 255, 0.3);
+    position: relative;
+}
+
+.color-wheel::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.color-wheel::after {
+    content: '?';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #003087;
+}
+
+/* Pointer indicator */
+.wheel-pointer {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 20px solid #003087;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    z-index: 10;
+}
+
+@keyframes spinWheel {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Glow effect around wheel */
+.color-wheel-glow {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        rgba(185, 28, 28, 0.3),
+        rgba(236, 72, 153, 0.3),
+        rgba(239, 68, 68, 0.3),
+        rgba(147, 51, 234, 0.3),
+        rgba(249, 115, 22, 0.3),
+        rgba(234, 88, 12, 0.3),
+        rgba(251, 146, 60, 0.3),
+        rgba(37, 99, 235, 0.3),
+        rgba(56, 189, 248, 0.3),
+        rgba(250, 204, 21, 0.3),
+        rgba(202, 138, 4, 0.3),
+        rgba(21, 128, 61, 0.3),
+        rgba(185, 28, 28, 0.3)
+    );
+    animation: spinWheel 4s linear infinite;
+    filter: blur(15px);
+    z-index: -1;
+}
