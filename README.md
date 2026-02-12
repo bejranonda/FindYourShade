@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.11.1-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.12.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -233,6 +233,14 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.12.0 (2025-02-12)
+- **New:** Result page shows percentage match (e.g., "85% ตรงกับคุณ")
+- **New:** Total players count displayed on result page
+- **New:** Runner-up shades (2nd & 3rd place) with percentages
+- **New:** Share button with screenshot functionality using html2canvas
+- **New:** Watermark "thalay.eu/shade2569" on shared images
+- **Improved:** Result page layout with better visual hierarchy
 
 ### v3.11.1 (2025-02-12)
 - **Fixed:** Desktop text sizes using CSS media queries (!important)

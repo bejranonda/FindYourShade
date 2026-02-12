@@ -88,12 +88,16 @@ const translations = {
         of: "จาก",
         back: "ย้อนกลับ",
         resultTitle: "ผลการวิเคราะห์",
+        matchScore: "ตรงกับคุณ",
+        runnersUp: "เฉดที่ใกล้เคียง",
+        totalPlayers: "ผู้เล่นทั้งหมด",
         edit: "ย้อนแก้ไข",
         stats: "ดูผลลัพธ์จากผู้เล่น",
         playAgain: "เล่นใหม่อีกครั้ง",
         globalStatsTitle: "ผลลัพธ์จากผู้เล่น",
         backHome: "กลับหน้าหลัก",
-        share: "แชร์ผลลัพธ์",
+        share: "📸 แชร์ผลลัพธ์",
+        screenshot: "บันทึกรูปผลลัพธ์",
         footerRelease: "Release: v3.6.1",
         footerSequel: "ภาคต่อของ Sim Thailand 2569"
     },
@@ -111,12 +115,16 @@ const translations = {
         of: "of",
         back: "Back",
         resultTitle: "Analysis Result",
+        matchScore: "Match",
+        runnersUp: "Similar Shades",
+        totalPlayers: "Total Players",
         edit: "Edit Answers",
         stats: "Player Response Statistics",
         playAgain: "Play Again",
         globalStatsTitle: "Player Response Statistics",
         backHome: "Back to Home",
-        share: "Share Result",
+        share: "📸 Share Result",
+        screenshot: "Save Result Image",
         footerRelease: "Release: v3.6.1",
         footerSequel: "Sequel to Sim Thailand 2569"
     }
@@ -756,19 +764,35 @@ function goBack() {
 
 async function showResult() {
     sound.playWin();
+
+    // Calculate total score for percentage
+    let totalScore = 0;
     let maxScore = -1;
     let winnerKey = 'WHITE';
 
     for (const [key, value] of Object.entries(scores)) {
+        totalScore += value;
         if (value > maxScore) {
             maxScore = value;
             winnerKey = key;
         }
     }
 
+    // Calculate percentage match
+    const matchPercent = totalScore > 0 ? Math.round((maxScore / totalScore) * 100) : 100;
+
+    // Get sorted scores for runner-ups
+    const sortedScores = Object.entries(scores)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3); // Top 3
+
     const result = categories[winnerKey];
     currentResult = result;
     const t = translations[currentLang];
+
+    // Get total players
+    const globalStats = await getGlobalStats();
+    const totalPlayers = Object.values(globalStats).reduce((a, b) => a + b, 0);
 
     saveToHistory(result);
     saveResultToDatabase(result);
@@ -776,21 +800,61 @@ async function showResult() {
     // Trigger Confetti
     startConfetti(result.confettiEmoji || '✨');
 
+    // Build runner-ups HTML (skip the winner, show next 2)
+    let runnersUpHtml = '';
+    if (sortedScores.length > 1) {
+        const runnerUps = sortedScores.slice(1, 3); // 2nd and 3rd place
+        runnersUpHtml = `
+            <div class="runners-up mt-4 w-full">
+                <div class="text-xs font-semibold text-gray-400 mb-2">${t.runnersUp}</div>
+                <div class="flex justify-center gap-4">
+                    ${runnerUps.map(([key, score]) => {
+                        const cat = categories[key];
+                        const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
+                        return `
+                            <div class="text-center">
+                                <div class="text-2xl">${cat.icon}</div>
+                                <div class="text-xs text-gray-500">${cat.name[currentLang].split(' ')[0]}</div>
+                                <div class="text-sm font-bold ${cat.textClass}">${pct}%</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     contentDiv.innerHTML = `
-        <div class="w-full h-full flex flex-col items-center text-center scale-in overflow-y-auto pb-8 font-['Kanit']">
+        <div id="result-content" class="w-full h-full flex flex-col items-center text-center scale-in overflow-y-auto pb-8 font-['Kanit']">
             <div class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-widest">${t.resultTitle}</div>
 
-            <div class="text-8xl mb-4 filter drop-shadow-md">${result.icon}</div>
+            <div class="text-6xl mb-3 filter drop-shadow-md">${result.icon}</div>
 
-            <h2 class="text-3xl font-black ${result.textClass} mb-2 leading-tight">
+            <h2 class="text-2xl md:text-3xl font-black ${result.textClass} mb-1 leading-tight">
                 ${result.name[currentLang]}
             </h2>
 
-            <div class="result-card mb-6 w-full bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <p class="leading-relaxed text-lg text-gray-700">
+            <div class="match-percent text-3xl md:text-4xl font-black text-[#003087] mb-3">
+                ${matchPercent}% <span class="text-sm font-normal text-gray-500">${t.matchScore}</span>
+            </div>
+
+            <div class="result-card mb-4 w-full bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
+                <p class="leading-relaxed text-base md:text-lg text-gray-700">
                     "${result.desc[currentLang]}"
                 </p>
+                ${runnersUpHtml}
             </div>
+
+            <!-- Total Players -->
+            <div class="total-players mb-4 px-4 py-2 bg-gray-100 rounded-full">
+                <span class="text-gray-500 text-sm">👥 ${t.totalPlayers}:</span>
+                <span class="font-bold text-[#003087] ml-1">${totalPlayers.toLocaleString()}</span>
+            </div>
+
+            <!-- Share Button -->
+            <button onclick="captureAndShare()" class="w-full mb-3 bg-gradient-to-r from-[#003087] to-[#0052cc] hover:from-[#002466] hover:to-[#003087] text-white py-4 rounded-lg shadow-lg font-bold transition-all transform hover:scale-[1.02]">
+                ${t.share}
+            </button>
 
             <div class="grid grid-cols-2 gap-3 w-full mb-4">
                 <button onclick="goBackFromResult()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-bold transition-colors">
@@ -804,8 +868,114 @@ async function showResult() {
             <button onclick="renderStartScreen()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-bold transition-colors">
                 🔄 ${t.playAgain}
             </button>
+
+            <!-- Watermark for screenshot -->
+            <div class="watermark mt-4 text-xs text-gray-400">
+                thalay.eu/shade2569
+            </div>
         </div>
     `;
+}
+
+// ============================================
+// Screenshot & Share Function
+// ============================================
+
+async function captureAndShare() {
+    sound.playBeep();
+
+    const t = translations[currentLang];
+    const resultContent = document.getElementById('result-content');
+
+    if (!resultContent) {
+        alert('Error: Result content not found');
+        return;
+    }
+
+    // Create a clone for screenshot
+    const clone = resultContent.cloneNode(true);
+    clone.style.cssText = `
+        position: fixed;
+        left: -9999px;
+        top: 0;
+        width: 400px;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 30px 25px;
+        font-family: 'Kanit', sans-serif;
+    `;
+
+    // Add branding header
+    const header = document.createElement('div');
+    header.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #003087;">
+            <div style="font-size: 14px; color: #003087; font-weight: bold;">คุณคือเฉดสีการเมืองไหน?</div>
+            <div style="font-size: 11px; color: #6b7280;">Thai Political Shade Quiz</div>
+        </div>
+    `;
+    clone.insertBefore(header.firstChild, clone.firstChild);
+
+    // Enhance watermark
+    const watermark = clone.querySelector('.watermark');
+    if (watermark) {
+        watermark.style.cssText = `
+            margin-top: 20px;
+            font-size: 12px;
+            color: #003087;
+            font-weight: bold;
+            padding: 8px 15px;
+            background: rgba(0, 48, 135, 0.1);
+            border-radius: 20px;
+        `;
+    }
+
+    // Remove buttons from screenshot
+    const buttons = clone.querySelectorAll('button');
+    buttons.forEach(btn => btn.remove());
+
+    document.body.appendChild(clone);
+
+    try {
+        // Use html2canvas if available, otherwise fallback
+        if (typeof html2canvas !== 'undefined') {
+            const canvas = await html2canvas(clone, {
+                scale: 2,
+                backgroundColor: '#f8fafc',
+                useCORS: true
+            });
+
+            // Download image
+            const link = document.createElement('a');
+            link.download = `findyourshade-${currentResult.id.toLowerCase()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            // Also try Web Share API if available
+            if (navigator.share && navigator.canShare) {
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], 'my-shade.png', { type: 'image/png' });
+                    try {
+                        await navigator.share({
+                            title: 'FindYourShade - คุณคือเฉดสีการเมืองไหน?',
+                            text: `ฉันคือ ${currentResult.name[currentLang]}! มาลองดูสิว่าคุณคือเฉดไหนที่ thalay.eu/shade2569`,
+                            files: [file]
+                        });
+                    } catch (shareError) {
+                        console.log('Share cancelled or not supported');
+                    }
+                });
+            }
+        } else {
+            // Fallback: Copy result text
+            const text = `🎯 ผลการวิเคราะห์: ${currentResult.name.th}\n📊 ตรงกับฉัน ${Math.round((maxScore / totalScore) * 100)}%\n\n✨ มาลองดูสิว่าคุณคือเฉดไหน?\n📍 thalay.eu/shade2569`;
+            await navigator.clipboard.writeText(text);
+            alert('คัดลอกผลลัพธ์แล้ว! วางเพื่อแชร์ได้เลย');
+        }
+    } catch (error) {
+        console.error('Screenshot error:', error);
+        alert('ไม่สามารถบันทึกรูปได้ กรุณาลองใหม่อีกครั้ง');
+    } finally {
+        document.body.removeChild(clone);
+    }
 }
 
 function goBackFromResult() {
