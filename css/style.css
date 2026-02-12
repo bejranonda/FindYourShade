@@ -269,8 +269,30 @@ body {
 /* Larger wheel on desktop */
 @media (min-width: 768px) {
     .color-wheel-container {
-        width: 150px;
-        height: 150px;
+        width: 160px;
+        height: 160px;
+        margin-bottom: 40px !important;
+    }
+}
+
+/* Start Screen - Desktop Improvements */
+@media (min-width: 768px) {
+    .start-title {
+        font-size: 1.75rem !important;  /* 28px instead of 24px */
+        margin-bottom: 0.75rem !important;
+    }
+
+    .start-desc {
+        font-size: 1.125rem !important;  /* 18px instead of 16px */
+        line-height: 1.75 !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+
+    .start-btn {
+        font-size: 1.25rem !important;  /* 20px instead of 18px */
+        padding-top: 1.25rem !important;
+        padding-bottom: 1.25rem !important;
     }
 }
 
