@@ -806,15 +806,15 @@ async function showResult() {
         const runnerUps = sortedScores.slice(1, 3); // 2nd and 3rd place
         runnersUpHtml = `
             <div class="runners-up mt-5 pt-4 border-t border-gray-200 w-full">
-                <div class="text-sm font-semibold text-gray-500 mb-3">${t.runnersUp}</div>
-                <div class="flex justify-center gap-10">
+                <div class="text-sm font-semibold text-gray-500 mb-4">${t.runnersUp}</div>
+                <div class="flex justify-center items-start gap-12">
                     ${runnerUps.map(([key, score]) => {
                         const cat = categories[key];
                         const pct = totalScore > 0 ? Math.round((score / totalScore) * 100) : 0;
                         return `
-                            <div class="text-center flex flex-col items-center">
+                            <div class="text-center flex flex-col items-center" style="min-width: 80px;">
                                 <div class="text-5xl mb-2">${cat.icon}</div>
-                                <div class="text-base text-gray-600 font-medium mb-1">${cat.name[currentLang].split(' ')[0]}</div>
+                                <div class="text-sm text-gray-600 font-medium mb-1">${cat.name[currentLang].split(' ')[0]}</div>
                                 <div class="text-xl font-bold ${cat.textClass}">${pct}%</div>
                             </div>
                         `;
