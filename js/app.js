@@ -972,8 +972,10 @@ async function captureAndShare() {
         </div>
 
         <!-- Watermark -->
-        <div style="text-align: center; margin-top: 20px;">
-            <span style="display: inline-block; font-size: 14px; color: #003087; font-weight: 600; padding: 10px 20px; background: rgba(0, 48, 135, 0.1); border-radius: 20px;">thalay.eu/shade2569</span>
+        <div style="text-align: center; margin-top: 25px; padding-top: 15px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; font-size: 14px; color: #003087; font-weight: 600; padding: 12px 24px; background: rgba(0, 48, 135, 0.1); border-radius: 25px;">
+                thalay.eu/shade2569
+            </div>
         </div>
     `;
 
@@ -1066,7 +1068,13 @@ async function showStats() {
 
     let html = `
         <div class="w-full h-full flex flex-col fade-in font-['Kanit']">
-            <h2 class="text-xl font-bold text-[#003087] mb-6 text-center">📊 ${t.globalStatsTitle}</h2>
+            <h2 class="text-xl font-bold text-[#003087] mb-2 text-center">📊 ${t.globalStatsTitle}</h2>
+            <div class="text-center mb-5">
+                <span class="inline-flex items-center px-4 py-2 bg-[#003087]/10 rounded-full">
+                    <span class="text-gray-600 text-sm">👥 ${t.totalPlayers}:</span>
+                    <span class="text-[#003087] font-bold text-lg ml-2">${total.toLocaleString()}</span>
+                </span>
+            </div>
             <div class="stats-container flex-1 overflow-y-auto pr-2 custom-scrollbar">
     `;
 
