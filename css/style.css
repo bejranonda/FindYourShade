@@ -415,21 +415,18 @@ body {
 .share-btn {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
-    background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite, float-btn 2s ease-in-out infinite;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 25%, #FE6B8B 50%, #FF8E53 75%, #FF6B6B 100%) !important;
+    background-size: 300% 300%;
+    animation: gradient-flow 4s ease infinite;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.5);
+    border: none;
+    color: white !important;
 }
 
-@keyframes gradient-shift {
+@keyframes gradient-flow {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
-}
-
-@keyframes float-btn {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
 }
 
 /* Shimmer effect */
@@ -438,28 +435,43 @@ body {
     position: absolute;
     top: 0;
     left: -100%;
-    width: 100%;
+    width: 60%;
     height: 100%;
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.3),
+        rgba(255, 255, 255, 0.4),
         transparent
     );
-    animation: shimmer 2s infinite;
+    animation: shimmer 2.5s infinite;
+    transform: skewX(-20deg);
 }
 
 @keyframes shimmer {
     0% { left: -100%; }
-    100% { left: 100%; }
+    100% { left: 200%; }
+}
+
+/* Pulse glow */
+.share-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+    animation: pulse-glow 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
 }
 
 .share-btn:hover {
-    animation: none;
     transform: scale(1.05) !important;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
-}
-
-.share-btn:hover::before {
-    animation: none;
+    box-shadow: 0 6px 30px rgba(255, 107, 107, 0.7) !important;
 }
