@@ -639,7 +639,7 @@ function renderStartScreen() {
 
     contentDiv.innerHTML = `
         <div class="text-center w-full fade-in font-['Kanit']">
-            <div class="color-wheel-container" style="margin-bottom: 64px;">
+            <div class="color-wheel-container" style="margin-bottom: 30px;">
                 <div class="color-wheel-glow"></div>
                 <div class="color-wheel"></div>
                 <div class="wheel-pointer"></div>
