@@ -1267,8 +1267,12 @@ async function shareWithImage(platform) {
             return;
         }
 
-        // Try Web Share API with file (works on mobile)
-        if (navigator.share && navigator.canShare) {
+        // Detect if we're on mobile (better Web Share API support)
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const hasWebShare = navigator.share && navigator.canShare;
+
+        // Try Web Share API with file (works best on mobile)
+        if (hasWebShare) {
             try {
                 const blob = await new Promise((resolve, reject) => {
                     canvas.toBlob((b) => {
@@ -1282,19 +1286,34 @@ async function shareWithImage(platform) {
                 }
 
                 const file = new File([blob], 'my-shade.png', { type: 'image/png' });
+                const shareData = {
+                    title: currentLang === 'th' ? 'FindYourShade - คุณคือเฉดสีการเมืองไหน?' : 'FindYourShade - What is your political shade?',
+                    text: getShortShareText()
+                };
 
-                // Check if we can share files
+                // Check if we can share files (mobile browsers mostly)
                 if (navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        title: currentLang === 'th' ? 'FindYourShade - คุณคือเฉดสีการเมืองไหน?' : 'FindYourShade - What is your political shade?',
-                        text: getShortShareText(),
-                        files: [file]
-                    });
-                    return; // Success! User shared via native share sheet
+                    shareData.files = [file];
+                }
+
+                // Try sharing (with or without file)
+                if (navigator.canShare(shareData)) {
+                    await navigator.share(shareData);
+
+                    // On desktop without file support, also download image
+                    if (!shareData.files && !isMobile) {
+                        downloadCanvas(canvas);
+                    }
+                    return; // Success!
                 }
             } catch (shareError) {
-                // User cancelled or share failed - fall through to fallback
-                console.log('Web Share cancelled or failed:', shareError);
+                // User cancelled - don't show error, just exit
+                if (shareError.name === 'AbortError') {
+                    console.log('User cancelled share');
+                    return;
+                }
+                console.log('Web Share failed:', shareError);
+                // Fall through to fallback
             }
         }
 
