@@ -1153,11 +1153,16 @@ function getShareText() {
         : `🎯 FindYourShade Analysis Result\n━━━━━━━━━━━━━━━━━\n📌 I am ${currentResult.name.en}\n📊 ${matchPercent}% Match\n\n✨ Find your political shade!\n📍 thalay.eu/shade2569`;
 }
 
-// Generate and download result image (used by social share buttons)
-async function downloadResultImage() {
+function getShortShareText() {
+    return currentLang === 'th'
+        ? `ฉันคือ ${currentResult.name.th} (${matchPercent}%) - มาลองดูสิว่าคุณคือเฉดไหน?`
+        : `I am ${currentResult.name.en} (${matchPercent}%) - Find your political shade!`;
+}
+
+// Generate result image and return canvas (for sharing)
+async function generateResultCanvas() {
     const t = translations[currentLang];
 
-    // Calculate normalized percentages
     const shadePercentages = Object.entries(scores)
         .map(([key, score]) => {
             const maxPossible = maxPossibleScores[key] || 1;
@@ -1170,7 +1175,6 @@ async function downloadResultImage() {
 
     const runnerUps = shadePercentages.slice(1, 3);
 
-    // Create screenshot container
     const container = document.createElement('div');
     container.id = 'screenshot-container-social';
     container.style.cssText = `
@@ -1223,72 +1227,125 @@ async function downloadResultImage() {
 
     document.body.appendChild(container);
 
+    let canvas = null;
     try {
         if (typeof html2canvas !== 'undefined') {
-            const canvas = await html2canvas(container, {
+            canvas = await html2canvas(container, {
                 scale: 2,
                 backgroundColor: '#f0f4f8',
                 useCORS: true,
                 logging: false
             });
-
-            // Download image
-            const link = document.createElement('a');
-            link.download = `findyourshade-${currentResult.id.toLowerCase()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
         }
     } catch (error) {
         console.error('Image generation error:', error);
     } finally {
         document.body.removeChild(container);
     }
+
+    return canvas;
+}
+
+// Download image helper
+function downloadCanvas(canvas) {
+    const link = document.createElement('a');
+    link.download = `findyourshade-${currentResult.id.toLowerCase()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+// Generic social share with Web Share API (image + text)
+async function shareWithImage(platform) {
+    sound.playBeep();
+
+    try {
+        const canvas = await generateResultCanvas();
+        if (!canvas) {
+            console.error('Canvas generation failed');
+            // Fallback: just open share URL without image
+            openShareUrl(platform);
+            return;
+        }
+
+        // Try Web Share API with file (works on mobile)
+        if (navigator.share && navigator.canShare) {
+            try {
+                const blob = await new Promise((resolve, reject) => {
+                    canvas.toBlob((b) => {
+                        if (b) resolve(b);
+                        else reject(new Error('toBlob returned null'));
+                    }, 'image/png');
+                });
+
+                if (!blob) {
+                    throw new Error('Blob is null');
+                }
+
+                const file = new File([blob], 'my-shade.png', { type: 'image/png' });
+
+                // Check if we can share files
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: currentLang === 'th' ? 'FindYourShade - คุณคือเฉดสีการเมืองไหน?' : 'FindYourShade - What is your political shade?',
+                        text: getShortShareText(),
+                        files: [file]
+                    });
+                    return; // Success! User shared via native share sheet
+                }
+            } catch (shareError) {
+                // User cancelled or share failed - fall through to fallback
+                console.log('Web Share cancelled or failed:', shareError);
+            }
+        }
+
+        // Fallback for desktop or unsupported browsers
+        downloadCanvas(canvas);
+        const msg = currentLang === 'th'
+            ? '📸 ดาวน์โหลดรูปแล้ว! อัพโหลดไปแชร์ได้เลย'
+            : '📸 Image downloaded! Upload to share';
+        alert(msg);
+        openShareUrl(platform);
+
+    } catch (error) {
+        console.error('Share error:', error);
+        // Ultimate fallback - just open share URL
+        openShareUrl(platform);
+    }
+}
+
+// Open platform-specific share URL
+function openShareUrl(platform) {
+    const text = getShortShareText();
+    const url = 'https://thalay.eu/shade2569';
+
+    let shareUrl;
+    switch (platform) {
+        case 'line':
+            shareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            break;
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(getShareText())}`;
+            break;
+        case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}&url=${encodeURIComponent(url)}`;
+            break;
+    }
+
+    if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
 }
 
 async function shareToLINE() {
-    sound.playBeep();
-    // First download the image
-    await downloadResultImage();
-
-    // Show notification
-    const msg = currentLang === 'th' ? '📸 ดาวน์โหลดรูปแล้ว! อัพโหลดไป LINE ได้เลย' : '📸 Image downloaded! Upload to LINE';
-    alert(msg);
-
-    // Then open LINE share
-    const text = currentLang === 'th'
-        ? `ฉันคือ ${currentResult.name.th} (${matchPercent}%) - มาลองดูสิว่าคุณคือเฉดไหน?`
-        : `I am ${currentResult.name.en} (${matchPercent}%) - Find your political shade!`;
-    const url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent('https://thalay.eu/shade2569')}&text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank', 'width=600,height=400');
+    await shareWithImage('line');
 }
 
 async function shareToFacebook() {
-    sound.playBeep();
-    // First download the image
-    await downloadResultImage();
-
-    // Show notification
-    const msg = currentLang === 'th' ? '📸 ดาวน์โหลดรูปแล้ว! อัพโหลดไป Facebook ได้เลย' : '📸 Image downloaded! Upload to Facebook';
-    alert(msg);
-
-    // Then open Facebook share
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://thalay.eu/shade2569')}&quote=${encodeURIComponent(getShareText())}`;
-    window.open(url, '_blank', 'width=600,height=400');
+    await shareWithImage('facebook');
 }
 
 async function shareToTwitter() {
-    sound.playBeep();
-    // First download the image
-    await downloadResultImage();
-
-    // Show notification
-    const msg = currentLang === 'th' ? '📸 ดาวน์โหลดรูปแล้ว! อัพโหลดไป X ได้เลย' : '📸 Image downloaded! Upload to X';
-    alert(msg);
-
-    // Then open Twitter share
-    const text = getShareText();
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://thalay.eu/shade2569')}`;
-    window.open(url, '_blank', 'width=600,height=400');
+    await shareWithImage('twitter');
 }
 
 // Helper function to get color hex from Tailwind class

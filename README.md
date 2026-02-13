@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.19.1-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.19.3-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -438,6 +438,18 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.19.3 (2025-02-13)
+- **Fixed:** Removed duplicate social share function definitions
+- **Fixed:** Better error handling in `shareWithImage()` with try/catch
+- **Fixed:** Proper blob handling with reject on null
+
+### v3.19.2 (2025-02-13)
+- **Improved:** Social share now uses Web Share API with image support (mobile)
+- **New:** `generateResultCanvas()` function for reusable image generation
+- **New:** `shareWithImage()` - unified share function with Web Share API
+- **UX:** Mobile users can share image + text together via native share sheet
+- **UX:** Desktop users get image download + share URL fallback
 
 ### v3.19.1 (2025-02-13)
 - **Improved:** Social share buttons now auto-download result image first
