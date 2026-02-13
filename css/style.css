@@ -433,3 +433,43 @@ body {
     box-shadow: 0 4px 16px rgba(0, 48, 135, 0.4);
     transform: translateY(-2px);
 }
+
+/* Social Share Buttons - Platform specific colors */
+.social-btn-line {
+    background-color: #00B900;
+    color: white !important;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 185, 0, 0.3);
+}
+
+.social-btn-line:hover {
+    background-color: #009900;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 185, 0, 0.4);
+}
+
+.social-btn-facebook {
+    background-color: #1877F2;
+    color: white !important;
+    border: none;
+    box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+}
+
+.social-btn-facebook:hover {
+    background-color: #166FE5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4);
+}
+
+.social-btn-twitter {
+    background-color: #000000;
+    color: white !important;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.social-btn-twitter:hover {
+    background-color: #1a1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}

@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.18.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.19.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -438,6 +438,15 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.19.0 (2025-02-13)
+- **New:** Social media share buttons (LINE, Facebook, Twitter/X)
+- **New:** Enhanced share text with detailed result info
+- **New:** `getShareText()` helper function for consistent share messages
+- **New:** `shareToLINE()`, `shareToFacebook()`, `shareToTwitter()` functions
+- **Improved:** Share text now includes percentage match and website name
+- **Improved:** Bilingual support for share messages (Thai/English)
+- **Style:** Social buttons with brand colors and SVG icons
 
 ### v3.18.0 (2025-02-13)
 - **Docs:** Added comprehensive "Concept, Approach & Method" section
