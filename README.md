@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.20.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-4.0.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -439,6 +439,19 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v4.0.0 (2025-02-13)
+- **Major Release:** Complete transparency & citizen verification system
+- **New:** Daily trend line chart with interactive legend
+- **New:** Tooltip shows all 13 political shades on hover
+- **New:** "วันนี้" (Today) counter instead of minimum
+- **New:** Social media share buttons (LINE, Facebook, Twitter/X)
+- **New:** Web Share API with image support for mobile
+- **New:** `/api/daily-stats` endpoint with 30-day rolling data
+- **New:** Anomaly detection using Z-score algorithm
+- **UX:** Click legend to toggle chart lines on/off
+- **UX:** Neutral language for anomalies ("สูงกว่าปกติ")
+- **Dependency:** Added Chart.js for chart rendering
 
 ### v3.20.0 (2025-02-13)
 - **New:** Daily trend chart showing political shades obtained each day
