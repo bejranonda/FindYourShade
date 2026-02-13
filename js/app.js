@@ -1490,7 +1490,7 @@ async function showStats() {
                     <h3 class="text-sm font-bold text-[#003087]">📈 ${t.dailyChartTitle}</h3>
                     <span class="text-xs text-gray-500">${t.dailyChartDesc}</span>
                 </div>
-                <div class="chart-container bg-gray-50 rounded-lg p-3" style="height: 120px;">
+                <div class="chart-container bg-gray-50 rounded-lg p-3" style="height: 180px;">
                     <canvas id="dailyChart"></canvas>
                 </div>
 
@@ -1558,30 +1558,34 @@ function initDailyChart(dailyStats, colorMap) {
         .slice(0, 5)
         .map(([key]) => key);
 
-    // Build datasets
+    // Build datasets - Line chart without fill
     const datasets = topCategories.map(catKey => {
         const cat = categories[catKey];
         return {
             label: cat ? cat.name[currentLang] : catKey,
             data: sortedData.map(d => d[catKey] || 0),
-            backgroundColor: (cat ? colorMap[cat.colorClass] : '#999') + '80',
             borderColor: cat ? colorMap[cat.colorClass] : '#999',
-            borderWidth: 1,
-            fill: true,
-            tension: 0.3
+            backgroundColor: cat ? colorMap[cat.colorClass] : '#999',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.2,
+            pointRadius: 2,
+            pointHoverRadius: 4
         };
     });
 
-    // Add total line
+    // Add total line (dashed)
     datasets.push({
         label: currentLang === 'th' ? 'รวม/วัน' : 'Total/day',
         data: sortedData.map(d => d.total),
         borderColor: '#003087',
-        backgroundColor: 'transparent',
+        backgroundColor: '#003087',
         borderWidth: 2,
+        borderDash: [5, 3],
         fill: false,
-        tension: 0.3,
-        pointRadius: 2
+        tension: 0.2,
+        pointRadius: 2,
+        pointHoverRadius: 4
     });
 
     new Chart(ctx, {
@@ -1598,11 +1602,28 @@ function initDailyChart(dailyStats, colorMap) {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        boxHeight: 2,
+                        padding: 6,
+                        font: { size: 9 },
+                        usePointStyle: false
+                    },
+                    onClick: function(e, legendItem, legend) {
+                        const index = legendItem.datasetIndex;
+                        const ci = legend.chart;
+                        const meta = ci.getDatasetMeta(index);
+                        meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                        ci.update();
+                    }
                 },
                 tooltip: {
                     mode: 'index',
-                    intersect: false
+                    intersect: false,
+                    bodyFont: { size: 10 },
+                    titleFont: { size: 10 }
                 }
             },
             scales: {
@@ -1622,7 +1643,7 @@ function initDailyChart(dailyStats, colorMap) {
                 }
             },
             interaction: {
-                mode: 'nearest',
+                mode: 'index',
                 axis: 'x',
                 intersect: false
             }
