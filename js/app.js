@@ -95,6 +95,13 @@ const translations = {
         stats: "ดูผลลัพธ์จากผู้เล่นอื่น",
         playAgain: "เล่นใหม่อีกครั้ง",
         globalStatsTitle: "ผลลัพธ์จากผู้เล่น",
+        dailyChartTitle: "แนวโน้มรายวัน",
+        dailyChartDesc: "30 วันล่าสุด",
+        avgPerDay: "เฉลี่ย/วัน",
+        summaryTitle: "สรุป",
+        anomalyNotice: "หมายเหตุ",
+        higherThanUsual: "สูงกว่าปกติ",
+        lowerThanUsual: "ต่ำกว่าปกติ",
         backHome: "กลับหน้าหลัก",
         share: "แชร์ผลลัพธ์",
         screenshot: "บันทึกรูปผลลัพธ์",
@@ -122,6 +129,13 @@ const translations = {
         stats: "Player Response Statistics",
         playAgain: "Play Again",
         globalStatsTitle: "Player Response Statistics",
+        dailyChartTitle: "Daily Trend",
+        dailyChartDesc: "Last 30 days",
+        avgPerDay: "Avg/day",
+        summaryTitle: "Summary",
+        anomalyNotice: "Note",
+        higherThanUsual: "Higher than usual",
+        lowerThanUsual: "Lower than usual",
         backHome: "Back to Home",
         share: "Share Result",
         screenshot: "Save Result Image",
@@ -582,6 +596,20 @@ async function getGlobalStats() {
         console.error("Failed to fetch stats", e);
         // Fallback to localStorage on error
         return JSON.parse(localStorage.getItem('globalStats') || '{}');
+    }
+}
+
+// Get daily stats from API
+async function getDailyStats() {
+    try {
+        const response = await fetch(`/api/daily-stats?t=${Date.now()}`);
+        if (response.ok) {
+            return await response.json();
+        }
+        return { dailyData: [], anomalies: [], summary: { totalDays: 0, avgPerDay: 0, stdDev: 0, maxInDay: 0, minInDay: 0 } };
+    } catch (e) {
+        console.error("Failed to fetch daily stats", e);
+        return { dailyData: [], anomalies: [], summary: { totalDays: 0, avgPerDay: 0, stdDev: 0, maxInDay: 0, minInDay: 0 } };
     }
 }
 
@@ -1405,18 +1433,71 @@ function goBackFromResult() {
 async function showStats() {
     sound.playSelect();
     const stats = await getGlobalStats();
+    const dailyStats = await getDailyStats();
     const total = Object.values(stats).reduce((a, b) => a + b, 0) || 1;
     const t = translations[currentLang];
+
+    // Color map for charts
+    const colorMap = {
+        'bg-red-700': '#b91c1c', 'bg-pink-500': '#ec4899', 'bg-red-500': '#ef4444',
+        'bg-purple-600': '#9333ea', 'bg-orange-500': '#f97316', 'bg-blue-600': '#2563eb',
+        'bg-sky-400': '#38bdf8', 'bg-orange-400': '#fb923c', 'bg-orange-600': '#ea580c',
+        'bg-yellow-400': '#facc15', 'bg-yellow-600': '#ca8a04', 'bg-green-700': '#15803d',
+        'bg-gray-400': '#9ca3af'
+    };
 
     let html = `
         <div class="w-full h-full flex flex-col fade-in font-['Kanit']">
             <h2 class="text-xl font-bold text-[#003087] mb-2 text-center">📊 ${t.globalStatsTitle}</h2>
-            <div class="text-center" style="margin-bottom: 28px;">
+            <div class="text-center" style="margin-bottom: 20px;">
                 <span class="inline-flex items-center px-4 py-2 bg-[#003087]/10 rounded-full">
                     <span class="text-gray-600 text-sm">👥 ${t.totalPlayers}:</span>
                     <span class="text-[#003087] font-bold text-lg ml-2">${total.toLocaleString()}</span>
                 </span>
             </div>
+
+            <!-- Daily Chart Section -->
+            <div class="daily-chart-section mb-4 px-2">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-bold text-[#003087]">📈 ${t.dailyChartTitle}</h3>
+                    <span class="text-xs text-gray-500">${t.dailyChartDesc}</span>
+                </div>
+                <div class="chart-container bg-gray-50 rounded-lg p-3" style="height: 150px;">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Summary & Anomaly Section -->
+            <div class="summary-section mb-4 px-2">
+                <div class="flex gap-2 mb-2">
+                    <div class="flex-1 bg-blue-50 rounded-lg p-2 text-center">
+                        <div class="text-xs text-gray-500">${t.avgPerDay}</div>
+                        <div class="text-lg font-bold text-[#003087]">${dailyStats.summary.avgPerDay}</div>
+                    </div>
+                    <div class="flex-1 bg-green-50 rounded-lg p-2 text-center">
+                        <div class="text-xs text-gray-500">${currentLang === 'th' ? 'สูงสุด' : 'Max'}</div>
+                        <div class="text-lg font-bold text-green-600">${dailyStats.summary.maxInDay}</div>
+                    </div>
+                    <div class="flex-1 bg-orange-50 rounded-lg p-2 text-center">
+                        <div class="text-xs text-gray-500">${currentLang === 'th' ? 'ต่ำสุด' : 'Min'}</div>
+                        <div class="text-lg font-bold text-orange-600">${dailyStats.summary.minInDay}</div>
+                    </div>
+                </div>
+
+                ${dailyStats.anomalies.length > 0 ? `
+                <div class="anomaly-notice bg-amber-50 border border-amber-200 rounded-lg p-2">
+                    <div class="text-xs font-medium text-amber-700 mb-1">💡 ${t.anomalyNotice}</div>
+                    <div class="text-xs text-amber-600">
+                        ${dailyStats.anomalies.slice(0, 3).map(a => {
+                            const dateStr = new Date(a.date).toLocaleDateString(currentLang === 'th' ? 'th-TH' : 'en-US', { day: 'numeric', month: 'short' });
+                            const icon = a.type === 'high' ? '📈' : '📉';
+                            return `<span class="inline-block mr-2">${icon} ${dateStr}: ${a.total} (${a.message})</span>`;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+
             <div class="stats-container flex-1 overflow-y-auto pr-2 custom-scrollbar">
     `;
 
@@ -1426,15 +1507,6 @@ async function showStats() {
         const cat = categories[key];
         const count = stats[key] || 0;
         const percent = ((count / total) * 100).toFixed(1);
-
-        // Simple color map for stats bars
-        const colorMap = {
-            'bg-red-700': '#b91c1c', 'bg-pink-500': '#ec4899', 'bg-red-500': '#ef4444',
-            'bg-purple-600': '#9333ea', 'bg-orange-500': '#f97316', 'bg-blue-600': '#2563eb',
-            'bg-sky-400': '#38bdf8', 'bg-orange-400': '#fb923c', 'bg-orange-600': '#ea580c',
-            'bg-yellow-400': '#facc15', 'bg-yellow-600': '#ca8a04', 'bg-green-700': '#15803d',
-            'bg-gray-400': '#9ca3af'
-        };
 
         html += `
             <div class="bar-row">
@@ -1454,6 +1526,110 @@ async function showStats() {
     html += `
             </div>
             <button onclick="renderStartScreen()" class="w-full mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-bold transition-colors">
+                ⬅ ${t.backHome}
+            </button>
+        </div>
+    `;
+
+    contentDiv.innerHTML = html;
+
+    // Initialize chart after DOM is ready
+    if (dailyStats.dailyData.length > 0 && typeof Chart !== 'undefined') {
+        initDailyChart(dailyStats, colorMap);
+    }
+}
+
+// Initialize daily chart
+function initDailyChart(dailyStats, colorMap) {
+    const ctx = document.getElementById('dailyChart');
+    if (!ctx) return;
+
+    // Sort data by date (oldest first)
+    const sortedData = [...dailyStats.dailyData].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Get top 5 categories for chart
+    const categoryTotals = {};
+    sortedData.forEach(d => {
+        dailyStats.categories.forEach(cat => {
+            categoryTotals[cat] = (categoryTotals[cat] || 0) + (d[cat] || 0);
+        });
+    });
+    const topCategories = Object.entries(categoryTotals)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([key]) => key);
+
+    // Build datasets
+    const datasets = topCategories.map(catKey => {
+        const cat = categories[catKey];
+        return {
+            label: cat ? cat.name[currentLang] : catKey,
+            data: sortedData.map(d => d[catKey] || 0),
+            backgroundColor: (cat ? colorMap[cat.colorClass] : '#999') + '80',
+            borderColor: cat ? colorMap[cat.colorClass] : '#999',
+            borderWidth: 1,
+            fill: true,
+            tension: 0.3
+        };
+    });
+
+    // Add total line
+    datasets.push({
+        label: currentLang === 'th' ? 'รวม/วัน' : 'Total/day',
+        data: sortedData.map(d => d.total),
+        borderColor: '#003087',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.3,
+        pointRadius: 2
+    });
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: sortedData.map(d => {
+                const date = new Date(d.date);
+                return date.toLocaleDateString(currentLang === 'th' ? 'th-TH' : 'en-US', { day: 'numeric', month: 'short' });
+            }),
+            datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    ticks: {
+                        font: { size: 8 },
+                        maxRotation: 45
+                    }
+                },
+                y: {
+                    display: true,
+                    beginAtZero: true,
+                    ticks: {
+                        font: { size: 8 }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}
                 ⬅ ${t.backHome}
             </button>
         </div>

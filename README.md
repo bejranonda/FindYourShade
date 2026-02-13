@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.19.4-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.20.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -415,7 +415,8 @@ FindYourShade/
 │       ├── save.js         # POST /api/save - Save result to D1
 │       ├── stats.js        # GET /api/stats - Get stats from D1
 │       ├── answer.js       # POST /api/answer - Save individual answer
-│       └── answers.js      # GET /api/answers - Get answer statistics
+│       ├── answers.js      # GET /api/answers - Get answer statistics
+│       └── daily-stats.js  # GET /api/daily-stats - Daily stats + anomaly detection
 ├── schema.sql              # D1 database schema
 ├── package.json            # Dependencies and build scripts
 ├── tailwind.config.js      # Tailwind configuration
@@ -438,6 +439,15 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v3.20.0 (2025-02-13)
+- **New:** Daily trend chart showing political shades obtained each day
+- **New:** `/api/daily-stats` endpoint with 30-day rolling data
+- **New:** Anomaly detection using Z-score algorithm (>2 std dev)
+- **New:** Summary statistics (avg/day, max, min) on stats page
+- **UX:** Neutral language for anomalies ("สูงกว่าปกติ" not "น่าสงสัย")
+- **UX:** Transparent data visualization for citizen verification
+- **Dependency:** Added Chart.js for chart rendering
 
 ### v3.19.4 (2025-02-13)
 - **Improved:** Better desktop/mobile detection for Web Share API
