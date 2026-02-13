@@ -1630,8 +1630,12 @@ function initDailyChart(dailyStats, colorMap) {
                     bodyFont: { size: 10 },
                     titleFont: { size: 10 },
                     callbacks: {
-                        // Show all categories in tooltip, not just displayed datasets
+                        // Replace default body with custom content showing all categories
+                        label: function(context) {
+                            return ''; // Hide default dataset labels
+                        },
                         afterBody: function(tooltipItems) {
+                            if (!tooltipItems || tooltipItems.length === 0) return [];
                             const index = tooltipItems[0].dataIndex;
                             const dayData = sortedData[index];
                             if (!dayData) return [];
@@ -1646,7 +1650,11 @@ function initDailyChart(dailyStats, colorMap) {
                                 .filter(c => c.count > 0)
                                 .sort((a, b) => b.count - a.count);
 
-                            return allCats.map(c => `  ${c.name}: ${c.count}`);
+                            // Add total at the end
+                            const lines = allCats.map(c => `${c.name}: ${c.count}`);
+                            lines.push('---');
+                            lines.push(`${currentLang === 'th' ? 'รวม' : 'Total'}: ${dayData.total}`);
+                            return lines;
                         }
                     }
                 }
