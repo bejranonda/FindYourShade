@@ -1153,8 +1153,108 @@ function getShareText() {
         : `🎯 FindYourShade Analysis Result\n━━━━━━━━━━━━━━━━━\n📌 I am ${currentResult.name.en}\n📊 ${matchPercent}% Match\n\n✨ Find your political shade!\n📍 thalay.eu/shade2569`;
 }
 
-function shareToLINE() {
+// Generate and download result image (used by social share buttons)
+async function downloadResultImage() {
+    const t = translations[currentLang];
+
+    // Calculate normalized percentages
+    const shadePercentages = Object.entries(scores)
+        .map(([key, score]) => {
+            const maxPossible = maxPossibleScores[key] || 1;
+            const normalizer = avgMaxPossible / maxPossible;
+            const normalizedScore = score * normalizer;
+            const percentage = Math.min(Math.round((normalizedScore / avgMaxPossible) * 100), 100);
+            return { key, score, percentage };
+        })
+        .sort((a, b) => b.percentage - a.percentage);
+
+    const runnerUps = shadePercentages.slice(1, 3);
+
+    // Create screenshot container
+    const container = document.createElement('div');
+    container.id = 'screenshot-container-social';
+    container.style.cssText = `
+        position: fixed;
+        left: -9999px;
+        top: 0;
+        width: 420px;
+        background: linear-gradient(180deg, #f0f4f8 0%, #e2e8f0 100%);
+        padding: 30px;
+        font-family: 'Kanit', sans-serif;
+        box-sizing: border-box;
+    `;
+
+    container.innerHTML = `
+        <div style="text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #003087;">
+            <div style="font-size: 16px; color: #003087; font-weight: bold;">คุณคือเฉดสีการเมืองไหน?</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Thai Political Shade Quiz</div>
+        </div>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <div style="font-size: 12px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">${t.resultTitle}</div>
+        </div>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <span style="font-size: 80px; line-height: 1;">${currentResult.icon}</span>
+        </div>
+        <div style="text-align: center; margin-bottom: 8px;">
+            <span style="font-size: 26px; font-weight: 800; color: ${getColorHex(currentResult.colorClass)};">${currentResult.name[currentLang]}</span>
+        </div>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span style="font-size: 36px; font-weight: 800; color: #003087;">${matchPercent}%</span>
+            <span style="font-size: 14px; color: #6b7280; margin-left: 5px;">${t.matchScore}</span>
+        </div>
+        <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            <p style="font-size: 15px; line-height: 1.6; color: #374151; margin: 0;">"${currentResult.desc[currentLang]}"</p>
+            ${runnerUps.length > 0 ? `
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
+                <div style="font-size: 12px; color: #6b7280; font-weight: 600; margin-bottom: 12px; text-align: center;">${t.runnersUp}</div>
+                <div style="display: flex; justify-content: center; gap: 40px;">
+                    ${runnerUps.map(shade => {
+        const cat = categories[shade.key];
+        return `<div style="text-align: center;"><div style="font-size: 40px; margin-bottom: 5px;">${cat.icon}</div><div style="font-size: 14px; color: #6b7280;">${shade.percentage}%</div></div>`;
+    }).join('')}
+                </div>
+            </div>
+            ` : ''}
+        </div>
+        <div style="text-align: center; margin-top: 25px; padding-top: 15px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; font-size: 14px; color: #003087; font-weight: 600; padding: 12px 24px; background: rgba(0, 48, 135, 0.1); border-radius: 25px;">thalay.eu/shade2569</div>
+        </div>
+    `;
+
+    document.body.appendChild(container);
+
+    try {
+        if (typeof html2canvas !== 'undefined') {
+            const canvas = await html2canvas(container, {
+                scale: 2,
+                backgroundColor: '#f0f4f8',
+                useCORS: true,
+                logging: false
+            });
+
+            // Download image
+            const link = document.createElement('a');
+            link.download = `findyourshade-${currentResult.id.toLowerCase()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    } catch (error) {
+        console.error('Image generation error:', error);
+    } finally {
+        document.body.removeChild(container);
+    }
+}
+
+async function shareToLINE() {
     sound.playBeep();
+    // First download the image
+    await downloadResultImage();
+
+    // Show notification
+    const msg = currentLang === 'th' ? '📸 ดาวน์โหลดรูปแล้ว! อัพโหลดไป LINE ได้เลย' : '📸 Image downloaded! Upload to LINE';
+    alert(msg);
+
+    // Then open LINE share
     const text = currentLang === 'th'
         ? `ฉันคือ ${currentResult.name.th} (${matchPercent}%) - มาลองดูสิว่าคุณคือเฉดไหน?`
         : `I am ${currentResult.name.en} (${matchPercent}%) - Find your political shade!`;
@@ -1162,14 +1262,30 @@ function shareToLINE() {
     window.open(url, '_blank', 'width=600,height=400');
 }
 
-function shareToFacebook() {
+async function shareToFacebook() {
     sound.playBeep();
+    // First download the image
+    await downloadResultImage();
+
+    // Show notification
+    const msg = currentLang === 'th' ? '📸 ดาวน์โหลดรูปแล้ว! อัพโหลดไป Facebook ได้เลย' : '📸 Image downloaded! Upload to Facebook';
+    alert(msg);
+
+    // Then open Facebook share
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://thalay.eu/shade2569')}&quote=${encodeURIComponent(getShareText())}`;
     window.open(url, '_blank', 'width=600,height=400');
 }
 
-function shareToTwitter() {
+async function shareToTwitter() {
     sound.playBeep();
+    // First download the image
+    await downloadResultImage();
+
+    // Show notification
+    const msg = currentLang === 'th' ? '📸 ดาวน์โหลดรูปแล้ว! อัพโหลดไป X ได้เลย' : '📸 Image downloaded! Upload to X';
+    alert(msg);
+
+    // Then open Twitter share
     const text = getShareText();
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://thalay.eu/shade2569')}`;
     window.open(url, '_blank', 'width=600,height=400');
