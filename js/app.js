@@ -1449,53 +1449,11 @@ async function showStats() {
     let html = `
         <div class="w-full h-full flex flex-col fade-in font-['Kanit']">
             <h2 class="text-xl font-bold text-[#003087] mb-2 text-center">📊 ${t.globalStatsTitle}</h2>
-            <div class="text-center" style="margin-bottom: 20px;">
+            <div class="text-center" style="margin-bottom: 16px;">
                 <span class="inline-flex items-center px-4 py-2 bg-[#003087]/10 rounded-full">
                     <span class="text-gray-600 text-sm">👥 ${t.totalPlayers}:</span>
                     <span class="text-[#003087] font-bold text-lg ml-2">${total.toLocaleString()}</span>
                 </span>
-            </div>
-
-            <!-- Daily Chart Section -->
-            <div class="daily-chart-section mb-4 px-2">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-sm font-bold text-[#003087]">📈 ${t.dailyChartTitle}</h3>
-                    <span class="text-xs text-gray-500">${t.dailyChartDesc}</span>
-                </div>
-                <div class="chart-container bg-gray-50 rounded-lg p-3" style="height: 150px;">
-                    <canvas id="dailyChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Summary & Anomaly Section -->
-            <div class="summary-section mb-4 px-2">
-                <div class="flex gap-2 mb-2">
-                    <div class="flex-1 bg-blue-50 rounded-lg p-2 text-center">
-                        <div class="text-xs text-gray-500">${t.avgPerDay}</div>
-                        <div class="text-lg font-bold text-[#003087]">${dailyStats.summary.avgPerDay}</div>
-                    </div>
-                    <div class="flex-1 bg-green-50 rounded-lg p-2 text-center">
-                        <div class="text-xs text-gray-500">${currentLang === 'th' ? 'สูงสุด' : 'Max'}</div>
-                        <div class="text-lg font-bold text-green-600">${dailyStats.summary.maxInDay}</div>
-                    </div>
-                    <div class="flex-1 bg-orange-50 rounded-lg p-2 text-center">
-                        <div class="text-xs text-gray-500">${currentLang === 'th' ? 'ต่ำสุด' : 'Min'}</div>
-                        <div class="text-lg font-bold text-orange-600">${dailyStats.summary.minInDay}</div>
-                    </div>
-                </div>
-
-                ${dailyStats.anomalies.length > 0 ? `
-                <div class="anomaly-notice bg-amber-50 border border-amber-200 rounded-lg p-2">
-                    <div class="text-xs font-medium text-amber-700 mb-1">💡 ${t.anomalyNotice}</div>
-                    <div class="text-xs text-amber-600">
-                        ${dailyStats.anomalies.slice(0, 3).map(a => {
-                            const dateStr = new Date(a.date).toLocaleDateString(currentLang === 'th' ? 'th-TH' : 'en-US', { day: 'numeric', month: 'short' });
-                            const icon = a.type === 'high' ? '📈' : '📉';
-                            return `<span class="inline-block mr-2">${icon} ${dateStr}: ${a.total} (${a.message})</span>`;
-                        }).join('')}
-                    </div>
-                </div>
-                ` : ''}
             </div>
 
             <div class="stats-container flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -1525,7 +1483,48 @@ async function showStats() {
 
     html += `
             </div>
-            <button onclick="renderStartScreen()" class="w-full mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-bold transition-colors">
+
+            <!-- Daily Chart Section -->
+            <div class="daily-chart-section mt-4 mb-3 px-2">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-bold text-[#003087]">📈 ${t.dailyChartTitle}</h3>
+                    <span class="text-xs text-gray-500">${t.dailyChartDesc}</span>
+                </div>
+                <div class="chart-container bg-gray-50 rounded-lg p-3" style="height: 120px;">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="flex gap-2 mt-2">
+                    <div class="flex-1 bg-blue-50 rounded-lg p-2 text-center">
+                        <div class="text-xs text-gray-500">${t.avgPerDay}</div>
+                        <div class="text-base font-bold text-[#003087]">${dailyStats.summary.avgPerDay}</div>
+                    </div>
+                    <div class="flex-1 bg-green-50 rounded-lg p-2 text-center">
+                        <div class="text-xs text-gray-500">${currentLang === 'th' ? 'สูงสุด' : 'Max'}</div>
+                        <div class="text-base font-bold text-green-600">${dailyStats.summary.maxInDay}</div>
+                    </div>
+                    <div class="flex-1 bg-orange-50 rounded-lg p-2 text-center">
+                        <div class="text-xs text-gray-500">${currentLang === 'th' ? 'ต่ำสุด' : 'Min'}</div>
+                        <div class="text-base font-bold text-orange-600">${dailyStats.summary.minInDay}</div>
+                    </div>
+                </div>
+
+                ${dailyStats.anomalies.length > 0 ? `
+                <div class="anomaly-notice bg-amber-50 border border-amber-200 rounded-lg p-2 mt-2">
+                    <div class="text-xs font-medium text-amber-700 mb-1">💡 ${t.anomalyNotice}</div>
+                    <div class="text-xs text-amber-600">
+                        ${dailyStats.anomalies.slice(0, 3).map(a => {
+                            const dateStr = new Date(a.date).toLocaleDateString(currentLang === 'th' ? 'th-TH' : 'en-US', { day: 'numeric', month: 'short' });
+                            const icon = a.type === 'high' ? '📈' : '📉';
+                            return `<span class="inline-block mr-2">${icon} ${dateStr}: ${a.total} (${a.message})</span>`;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+
+            <button onclick="renderStartScreen()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-bold transition-colors">
                 ⬅ ${t.backHome}
             </button>
         </div>
