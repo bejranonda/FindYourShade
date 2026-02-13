@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-3.17.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-3.18.0-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -13,7 +13,7 @@ A fun, interactive quiz to discover your political shade in Thailand's political
 
 ## 🎯 Features
 
-### 12 Political Shade Categories
+### 13 Political Shade Categories
 
 | Shade | Thai Name | Description |
 |-------|-----------|-------------|
@@ -23,6 +23,7 @@ A fun, interactive quiz to discover your political shade in Thailand's political
 | ✨ | แดงดารา (Dara) | Celebrity Red - Pop culture progressive |
 | 🍊👓 | ส้มวิชาการ (Academic Orange) | Academic - Evidence-based progressive |
 | 🧡🔥 | ส้มแบก (Fandom Orange) | Fandom - Passionate movement supporter |
+| 🎭 | ส้มแอบเนียน (Orange) | Closeted Orange - Silent supporter with sympathies |
 | 🎗️ | เหลืองคลาสสิก (Classic Yellow) | Classic - Traditional conservative |
 | 👑 | เหลืองสถาบัน (Royalist) | Royalist - Institution protector |
 | 🔵 | น้ำเงิน (Blue) | Blue - Establishment moderate |
@@ -46,6 +47,143 @@ A fun, interactive quiz to discover your political shade in Thailand's political
 - **🚀 Pages Functions** - Serverless API endpoints
 - **🔒 Security Headers** - CSP, XSS protection, frame denial
 - **📦 Cache-Busting** - Versioned assets for fresh deployments
+
+---
+
+## 💡 Concept, Approach & Method
+
+### Concept
+
+This quiz is designed to map respondents to one of **13 political shades** in Thailand's complex political landscape. Unlike traditional left-right spectrums, Thai politics involves multiple dimensions:
+
+- **Historical allegiance** (Yellow vs Red movements)
+- **Generational divide** (Traditional vs New Gen)
+- **Institutional loyalty** (Royalist vs Reformist)
+- **Approach to change** (Revolutionary vs Evolutionary vs Status Quo)
+- **Cultural expression** (Academic vs Pop Culture vs Mainstream)
+
+Each shade represents a unique combination of these factors, creating a nuanced political identity map.
+
+### Approach
+
+#### 1. Multi-Dimensional Scoring
+
+Rather than forcing users into a single axis, we use **multi-dimensional scoring**:
+
+```
+Each answer contributes to multiple shades simultaneously
+├── Primary shade: +3 points (strong alignment)
+├── Secondary shade: +2 points (moderate alignment)
+└── Tertiary shade: +1 point (partial alignment)
+```
+
+This allows for **overlap detection** and more accurate shade matching.
+
+#### 2. Normalized Percentage Calculation
+
+To ensure fair comparison across all shades, we use **score normalization**:
+
+```
+normalizedScore = rawScore × (avgMaxScore / maxPossibleScore)
+
+Where:
+- rawScore = Total points accumulated for a shade
+- avgMaxScore = Average maximum possible score across all shades (~19)
+- maxPossibleScore = Maximum achievable for that specific shade
+```
+
+**Why normalization matters:**
+- Different shades have different answer opportunities
+- Without normalization, shades with more answer options would dominate
+- Normalized scores represent "how well you match" on a comparable scale
+- All shades can now achieve 100% with perfect answers
+
+#### 3. Score Balance Optimization
+
+Each shade has been calibrated for fair scoring:
+
+| Shade | Max Score | Balance Status |
+|-------|-----------|----------------|
+| NAM_MAK | 21 | ✅ Balanced |
+| NOM_PHONG | 18 | ✅ Balanced |
+| MADAM | 20 | ✅ Balanced |
+| DARA | 20 | ✅ Balanced (v3.17.0) |
+| ORANGE_ACADEMIC | 19 | ✅ Balanced |
+| ORANGE_FAN | 19 | ✅ Balanced |
+| ORANGE | 16 | ✅ Balanced (v3.17.0) |
+| YELLOW_CLASSIC | 19 | ✅ Balanced |
+| YELLOW_ROYALIST | 21 | ✅ Balanced |
+| BLUE | 20 | ✅ Balanced |
+| SKY_BLUE | 19 | ✅ Balanced |
+| GREEN | 20 | ✅ Balanced |
+| WHITE | 18 | ✅ Balanced |
+
+**Average max score:** ~19 points
+
+### Method
+
+#### Question Design Principles
+
+1. **Scenario-Based Questions**: Each question presents a realistic political scenario rather than direct ideological questions, reducing social desirability bias.
+
+2. **Balanced Answer Distribution**: Each question has 5-9 answer options covering the full spectrum of political views.
+
+3. **Randomized Order**: Fisher-Yates shuffle ensures answers appear in random order to prevent position bias.
+
+4. **Topic Diversity**: 7 questions cover different dimensions:
+   - Q1: Historical allegiance
+   - Q2: Core values & principles
+   - Q3: Leadership preference
+   - Q4: Approach to conflict
+   - Q5: Reform attitudes
+   - Q6: Information sources
+   - Q7: Personal expression
+
+#### Scoring Algorithm
+
+```javascript
+// Calculate raw scores
+for each answer:
+    for each shade in answer.score:
+        scores[shade] += answer.score[shade]
+
+// Normalize for fair comparison
+avgMax = average(maxPossibleScore for all shades)
+for each shade:
+    normalizedScore = score[shade] * (avgMax / maxPossible[shade])
+    percentage = (normalizedScore / avgMax) * 100
+
+// Determine result
+result = shade with highest normalizedScore
+```
+
+#### Result Calculation
+
+1. **Primary Result**: Shade with highest normalized percentage
+2. **Runner-ups**: 2nd and 3rd place shades with their percentages
+3. **Tie-breaking**: Rare edge cases resolved by secondary score factors
+
+### Technical Implementation
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Quiz Flow                            │
+├─────────────────────────────────────────────────────────┤
+│  [Start] → [Q1] → [Q2] → ... → [Q7] → [Calculate]      │
+│                                      ↓                  │
+│                              ┌───────────────┐          │
+│                              │ Normalization │          │
+│                              └───────────────┘          │
+│                                      ↓                  │
+│                            ┌─────────────────┐          │
+│                            │ Result + Stats  │          │
+│                            └─────────────────┘          │
+│                                      ↓                  │
+│                            ┌─────────────────┐          │
+│                            │ Save to D1 DB   │          │
+│                            └─────────────────┘          │
+└─────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -301,6 +439,15 @@ FindYourShade/
 
 ## 📝 Changelog
 
+### v3.18.0 (2025-02-13)
+- **Docs:** Added comprehensive "Concept, Approach & Method" section
+- **Docs:** Documented multi-dimensional scoring methodology
+- **Docs:** Added score normalization formula explanation
+- **Docs:** Added score balance table for all 13 shades
+- **Docs:** Fixed shade count (12 → 13) including ส้มแอบเนียน (Orange)
+- **Docs:** Added question design principles documentation
+- **Docs:** Added technical implementation flow diagram
+
 ### v3.17.0 (2025-02-12)
 - **Improved:** Better score balance for all 13 political shades
 - **Improved:** แดงดารา (DARA) max score increased from 15 to 20 (+5)
@@ -310,6 +457,9 @@ FindYourShade/
 - **New:** Added `/api/clear-answers` endpoint for database maintenance
 - **Database:** Cleared old answers data to match new question structure
 - **Docs:** Added `scripts/clear-answers.sql` for manual database cleanup
+- **Docs:** Added comprehensive "Concept, Approach & Method" section
+- **Docs:** Fixed shade count (12 → 13) including ส้มแอบเนียน (Orange)
+- **Docs:** Added score balance table and normalization formula documentation
 
 ### v3.16.0 (2025-02-12)
 - **New:** Normalized percentage calculation for fair cross-shade comparison

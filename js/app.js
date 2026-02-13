@@ -98,7 +98,7 @@ const translations = {
         backHome: "กลับหน้าหลัก",
         share: "แชร์ผลลัพธ์",
         screenshot: "บันทึกรูปผลลัพธ์",
-        footerRelease: "Release: v3.17.0",
+        footerRelease: "Release: v3.18.0",
         footerSequel: "ภาคต่อของ Sim Thailand 2569"
     },
     en: {
@@ -125,7 +125,7 @@ const translations = {
         backHome: "Back to Home",
         share: "Share Result",
         screenshot: "Save Result Image",
-        footerRelease: "Release: v3.17.0",
+        footerRelease: "Release: v3.18.0",
         footerSequel: "Sequel to Sim Thailand 2569"
     }
 };
