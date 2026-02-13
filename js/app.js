@@ -1630,13 +1630,6 @@ function initDailyChart(dailyStats, colorMap) {
         }
     });
 }
-                ⬅ ${t.backHome}
-            </button>
-        </div>
-    `;
-
-    contentDiv.innerHTML = html;
-}
 
 // ============================================
 // Initialize
