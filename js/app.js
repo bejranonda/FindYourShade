@@ -1437,6 +1437,11 @@ async function showStats() {
     const total = Object.values(stats).reduce((a, b) => a + b, 0) || 1;
     const t = translations[currentLang];
 
+    // Calculate today's total
+    const today = new Date().toISOString().split('T')[0];
+    const todayData = dailyStats.dailyData.find(d => d.date === today);
+    dailyStats.todayTotal = todayData ? todayData.total : 0;
+
     // Color map for charts
     const colorMap = {
         'bg-red-700': '#b91c1c', 'bg-pink-500': '#ec4899', 'bg-red-500': '#ef4444',
@@ -1504,9 +1509,9 @@ async function showStats() {
                         <div class="text-xs text-gray-500">${currentLang === 'th' ? 'สูงสุด' : 'Max'}</div>
                         <div class="text-base font-bold text-green-600">${dailyStats.summary.maxInDay}</div>
                     </div>
-                    <div class="flex-1 bg-orange-50 rounded-lg p-2 text-center">
-                        <div class="text-xs text-gray-500">${currentLang === 'th' ? 'ต่ำสุด' : 'Min'}</div>
-                        <div class="text-base font-bold text-orange-600">${dailyStats.summary.minInDay}</div>
+                    <div class="flex-1 bg-purple-50 rounded-lg p-2 text-center">
+                        <div class="text-xs text-gray-500">${currentLang === 'th' ? 'วันนี้' : 'Today'}</div>
+                        <div class="text-base font-bold text-purple-600">${dailyStats.todayTotal || 0}</div>
                     </div>
                 </div>
 
@@ -1623,7 +1628,27 @@ function initDailyChart(dailyStats, colorMap) {
                     mode: 'index',
                     intersect: false,
                     bodyFont: { size: 10 },
-                    titleFont: { size: 10 }
+                    titleFont: { size: 10 },
+                    callbacks: {
+                        // Show all categories in tooltip, not just displayed datasets
+                        afterBody: function(tooltipItems) {
+                            const index = tooltipItems[0].dataIndex;
+                            const dayData = sortedData[index];
+                            if (!dayData) return [];
+
+                            // Get all categories sorted by count for this day
+                            const allCats = dailyStats.categories
+                                .map(catKey => {
+                                    const cat = categories[catKey];
+                                    const count = dayData[catKey] || 0;
+                                    return { key: catKey, name: cat ? cat.name[currentLang] : catKey, count, color: cat ? colorMap[cat.colorClass] : '#999' };
+                                })
+                                .filter(c => c.count > 0)
+                                .sort((a, b) => b.count - a.count);
+
+                            return allCats.map(c => `  ${c.name}: ${c.count}`);
+                        }
+                    }
                 }
             },
             scales: {
