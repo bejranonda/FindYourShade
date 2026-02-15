@@ -9,6 +9,8 @@
 
 A fun, interactive quiz to discover your political shade in Thailand's political landscape. Built with vanilla JavaScript and deployed on Cloudflare Pages.
 
+<img width="1020" height="651" alt="image" src="https://github.com/user-attachments/assets/fe2bee3e-d3ad-417e-9ffa-5ec289d0e67a" />
+
 ---
 
 ## 🎯 Features
@@ -39,6 +41,10 @@ A fun, interactive quiz to discover your political shade in Thailand's political
 - **⬅️ Back Navigation** - Review and change answers at any time
 - **🌐 Bilingual Support** - Thai and English interface
 - **📱 Responsive Design** - Works seamlessly on mobile and desktop
+
+<img width="858" height="522" alt="image" src="https://github.com/user-attachments/assets/ba969d4b-4ee2-4d8d-b716-b39be2b7b112" />
+*Daily player one day after releasing*
+
 
 ### Production Ready
 
