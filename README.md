@@ -43,7 +43,7 @@ A fun, interactive quiz to discover your political shade in Thailand's political
 - **📱 Responsive Design** - Works seamlessly on mobile and desktop
 
 <img width="858" height="522" alt="image" src="https://github.com/user-attachments/assets/ba969d4b-4ee2-4d8d-b716-b39be2b7b112" />
-*Daily player one day after releasing*
+*Daily players one day after release*
 
 
 ### Production Ready
