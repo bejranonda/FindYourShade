@@ -1,7 +1,7 @@
 # คุณคือเฉดสีการเมืองไหน? | Thai Political Shade Quiz
 
 [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-orange?logo=cloudflare)](https://pages.cloudflare.com)
-[![Version](https://img.shields.io/badge/version-4.0.1-blue)](https://github.com/bejranonda/FindYourShade/releases)
+[![Version](https://img.shields.io/badge/version-4.0.2-blue)](https://github.com/bejranonda/FindYourShade/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-findyourshade.autobahn.bot-brightgreen)](https://findyourshade.autobahn.bot/)
 
@@ -185,11 +185,28 @@ result = shade with highest normalizedScore
 │                            │ Result + Stats  │          │
 │                            └─────────────────┘          │
 │                                      ↓                  │
-│                            ┌─────────────────┐          │
-│                            │ Save to D1 DB   │          │
-│                            └─────────────────┘          │
+│                  ┌───────────────────────────────────┐  │
+│                  │ D1 Batch Save + Counter Upserts   │  │
+│                  │ (stats, stats_counts, daily_...)  │  │
+│                  └───────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
 ```
+
+#### Low-`rows_read` D1 Data Architecture (v4.0.2+)
+
+Cloudflare D1 Free Tier enforces a cap of **5,000,000 `rows_read` per day**. Because `stats` has **160,000+ rows** and `answers` has **1,100,000+ rows**, running `SELECT COUNT(*) ... GROUP BY` on raw event tables scans the entire table on every call.
+
+To keep D1 `rows_read` under **0.1%** of the daily free tier limit even under heavy traffic, FindYourShade uses a **3-tier read optimization method**:
+
+1. **Pre-Aggregated Summary Counter Tables**:
+   - `stats_counts (category_id PRIMARY KEY, count)`: Maximum **13 rows**. Updated atomically on `POST /api/save` via `INSERT ... ON CONFLICT DO UPDATE SET count = count + 1`.
+   - `daily_stats_counts (date, category_id, count, PRIMARY KEY (date, category_id))`: Stores daily totals per shade (~80–390 rows for a 30-day window).
+   - `answer_counts (question_id, choice_index, count, PRIMARY KEY (question_id, choice_index))`: Maximum **80 rows** across all questions and choices.
+2. **Multi-Layer Caching (Browser + Cloudflare Edge Cache)**:
+   - Frontend (`js/app.js`) maintains a 60-second in-memory session cache with **optimistic local increments** when a player finishes the quiz, avoiding cache-busting `?t=` query parameters.
+   - Pages Functions normalize incoming request URLs (stripping any legacy `?t=` query parameters) and cache responses in Cloudflare's Edge Cache (`caches.default`) with `Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=600`.
+3. **Zero-Downtime Static Snapshot Fallback**:
+   - If D1 ever hits a rate/quota limit or is temporarily unavailable, both the Pages Functions and the client automatically fall back to a verified baseline snapshot (`X-Stats-Source: static-fallback`) merged with `localStorage`.
 
 ---
 
@@ -261,15 +278,24 @@ For global statistics to work, set up Cloudflare D1:
 wrangler d1 create DB --name=findyourshade-db
 ```
 
-### 2. Apply Schema
+### 2. Apply Schema & Summary Table Migration
 
 ```bash
+# Apply full schema (for new databases)
 wrangler d1 execute DB --remote --file=schema.sql
+
+# Or migrate an existing database to pre-aggregated summary tables
+wrangler d1 execute DB --remote --file=scripts/migrate-summary-tables.sql
 ```
 
-This creates two tables:
-- `stats` - Stores final quiz results
-- `answers` - Stores individual answer choices for analytics
+This creates:
+- `stats` - Raw log of quiz results (`category_id`, `created_at`)
+- `stats_counts` - Pre-aggregated global totals per shade (max 13 rows, used by `GET /api/stats`)
+- `daily_stats_counts` - Pre-aggregated daily totals per shade (used by `GET /api/daily-stats`)
+- `answer_counts` - Pre-aggregated choice totals per question (max 80 rows, used by `GET /api/answers`)
+- `answers` - Legacy raw answer log
+
+> **Note:** All Pages Functions also include automatic self-initialization and backfill logic if summary tables do not exist yet.
 
 ### 3. Configure Binding
 
@@ -325,7 +351,33 @@ Retrieve global statistics.
 }
 ```
 
-**Caching:** Response is cached for 60 seconds.
+**Caching:** Cached for 60s in browser, 300s at Cloudflare Edge (`caches.default`), and 60s in client session memory. Includes `X-Stats-Source: d1-summary | static-fallback` header.
+
+### GET /api/daily-stats
+
+Retrieve 30-day rolling daily statistics and Z-score anomaly detection (`|Z| > 2`).
+
+**Response:**
+```json
+{
+  "dailyData": [
+    { "date": "2026-10-28", "total": 21, "NOM_PHONG": 7, "ORANGE_ACADEMIC": 3 }
+  ],
+  "categories": ["NOM_PHONG", "ORANGE_ACADEMIC"],
+  "anomalies": [
+    { "date": "2026-10-28", "total": 21, "type": "high", "zscore": 3.75, "avg": 4.5, "message": "สูงกว่าปกติ 188%" }
+  ],
+  "summary": {
+    "totalDays": 25,
+    "avgPerDay": 4.5,
+    "stdDev": 4.4,
+    "maxInDay": 21,
+    "minInDay": 0
+  }
+}
+```
+
+**Caching:** Cached for 120s in browser and 300s at Cloudflare Edge (`caches.default`).
 
 ### POST /api/answer
 
@@ -386,7 +438,11 @@ GET /api/answers?questionId=0
 }
 ```
 
-**Caching:** Response is cached for 60 seconds.
+**Caching:** Cached for 120s in browser and 300s at Cloudflare Edge (`caches.default`). Includes `X-Stats-Source: d1-summary | static-fallback` header.
+
+### POST /api/clear-answers
+
+Clear `answers` and `answer_counts` tables when quiz questions are modified (requires confirmation payload `{ "confirm": "CLEAR_ANSWERS" }`).
 
 ---
 
@@ -418,11 +474,20 @@ FindYourShade/
 │   └── app.js              # Main application logic
 ├── functions/
 │   └── api/
-│       ├── save.js         # POST /api/save - Save result to D1
-│       ├── stats.js        # GET /api/stats - Get stats from D1
-│       ├── answer.js       # POST /api/answer - Save individual answer
-│       ├── answers.js      # GET /api/answers - Get answer statistics
-│       └── daily-stats.js  # GET /api/daily-stats - Daily stats + anomaly detection
+│       ├── save.js         # POST /api/save - Save result + increment summary counters
+│       ├── stats.js        # GET /api/stats - Get global stats from summary table
+│       ├── answer.js       # POST /api/answer - Increment question choice counter
+│       ├── answers.js      # GET /api/answers - Get answer statistics from summary table
+│       ├── daily-stats.js  # GET /api/daily-stats - Daily stats + anomaly detection
+│       └── clear-answers.js # POST /api/clear-answers - Clear answer statistics
+├── scripts/
+│   ├── clear-answers.sql           # Manual SQL to clear answer tables
+│   └── migrate-summary-tables.sql  # SQL migration for pre-aggregated summary tables
+├── docs/
+│   ├── KNOWLEDGE.md        # Domain & technical knowledge base
+│   ├── KNOWN-ISSUES.md     # Root-cause analysis & known issues log
+│   └── GUIDELINES.md       # Engineering, D1 database, and release guidelines
+├── HANDOFF.md              # Engineering handoff & operations guide
 ├── schema.sql              # D1 database schema
 ├── package.json            # Dependencies and build scripts
 ├── tailwind.config.js      # Tailwind configuration
@@ -445,6 +510,14 @@ FindYourShade/
 ---
 
 ## 📝 Changelog
+
+### v4.0.2 (2026-10-28)
+- **Performance (D1):** Reduced Cloudflare D1 `rows_read` by >99.9% (from 160,240+ rows per request down to 13–80 rows on cache miss and 0 rows on cache hit)
+- **Database:** Added pre-aggregated summary counter tables (`stats_counts`, `daily_stats_counts`, `answer_counts`) and `idx_stats_created_at` index in `schema.sql` and `scripts/migrate-summary-tables.sql`
+- **Caching:** Added Cloudflare Edge Cache (`caches.default`) with normalized cache keys (stripping legacy `?t=` query params) and `stale-while-revalidate` headers across all `GET` endpoints
+- **Frontend:** Removed `?t=${Date.now()}` cache-busting on `/api/stats` and `/api/daily-stats`, added 60s in-memory session cache with optimistic local increments on quiz completion
+- **Reliability:** Added zero-downtime static snapshot fallbacks (`X-Stats-Source: static-fallback`) when D1 free-tier daily cap is reached, and fixed `localStorage` stats merge to add rather than overwrite counts
+- **Docs:** Added `HANDOFF.md`, `docs/KNOWLEDGE.md`, `docs/KNOWN-ISSUES.md`, and `docs/GUIDELINES.md`
 
 ### v4.0.1 (2025-02-15)
 - **New:** Added X/Twitter link to header next to Facebook
