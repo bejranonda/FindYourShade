@@ -64,3 +64,4 @@ All stats `GET` endpoints return an `X-Stats-Source` HTTP header for observabili
 ### 3.3 Client-Side Session Cache & Optimistic Updates
 - `js/app.js` caches `getGlobalStats()` and `getDailyStats()` in memory for `60,000 ms` (`STATS_CACHE_TTL_MS`).
 - When a user finishes the quiz, `saveResultToDatabase(category)` immediately increments `cachedGlobalStats[category.id]` in memory so the user sees their result included in the global count without triggering an uncached D1 query.
+

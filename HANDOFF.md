@@ -108,3 +108,4 @@ npx wrangler d1 execute DB --remote --file=scripts/clear-answers.sql
 - **[Knowledge Base (`docs/KNOWLEDGE.md`)](docs/KNOWLEDGE.md):** Detailed domain model, 13 political shades, database schema reference, and Cloudflare D1 internals.
 - **[Known Issues & Postmortems (`docs/KNOWN-ISSUES.md`)](docs/KNOWN-ISSUES.md):** Root-cause analysis of the D1 5M `rows_read` incident, cache-busting pitfalls, and historical bug fixes.
 - **[Engineering Guidelines (`docs/GUIDELINES.md`)](docs/GUIDELINES.md):** Mandatory rules for D1 SQL queries, caching headers, frontend asset versioning, and testing.
+

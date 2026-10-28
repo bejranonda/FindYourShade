@@ -59,3 +59,4 @@ This document tracks known issues, root causes, and their resolutions in **FindY
 
 ### Workaround / Standard Procedure
 - Always increment the version query parameter (`?v=X.Y.Z`) in `index.html` whenever modifying any file under `js/` or `css/`.
+
