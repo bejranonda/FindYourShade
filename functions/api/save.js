@@ -100,9 +100,6 @@ async function ensureAndBackfillSummaryTables(db) {
         count INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (date, category_id)
       )
-    `),
-    db.prepare(`
-      CREATE INDEX IF NOT EXISTS idx_stats_created_at ON stats(created_at)
     `)
   ]);
 

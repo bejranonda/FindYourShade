@@ -155,10 +155,14 @@ async function initAnswerCounts(db) {
     )
   `).run();
 
-  await db.prepare(`
-    INSERT OR REPLACE INTO answer_counts (question_id, choice_index, count)
-    SELECT question_id, choice_index, COUNT(*) as count
-    FROM answers
-    GROUP BY question_id, choice_index
-  `).run();
+  try {
+    await db.prepare(`
+      INSERT OR REPLACE INTO answer_counts (question_id, choice_index, count)
+      SELECT question_id, choice_index, COUNT(*) as count
+      FROM answers
+      GROUP BY question_id, choice_index
+    `).run();
+  } catch (e) {
+    // If full scan of 1.1M-row answers table hits daily cap, table remains ready for new increments
+  }
 }

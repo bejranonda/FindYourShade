@@ -184,11 +184,11 @@ async function initDailyStatsCounts(db) {
     )
   `).run();
 
-  await db.prepare(`
-    CREATE INDEX IF NOT EXISTS idx_stats_created_at ON stats(created_at)
-  `).run();
-
   try {
+    await db.prepare(`
+      CREATE INDEX IF NOT EXISTS idx_stats_created_at ON stats(created_at)
+    `).run();
+
     await db.prepare(`
       INSERT OR REPLACE INTO daily_stats_counts (date, category_id, count)
       SELECT DATE(created_at) as date, category_id, COUNT(*) as count
