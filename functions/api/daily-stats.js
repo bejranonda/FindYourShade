@@ -157,7 +157,7 @@ export async function onRequest(context) {
   } catch (err) {
     // Graceful fallback if D1 daily cap is exceeded
     const fallbackPayload = buildDailyResponse(FALLBACK_DAILY_ROWS);
-    return new Response(JSON.stringify(fallbackPayload), {
+    const fallbackResponse = new Response(JSON.stringify(fallbackPayload), {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -165,6 +165,12 @@ export async function onRequest(context) {
         'X-Stats-Source': 'static-fallback'
       }
     });
+
+    if (cache && context.waitUntil) {
+      context.waitUntil(cache.put(cacheKey, fallbackResponse.clone()));
+    }
+
+    return fallbackResponse;
   }
 }
 

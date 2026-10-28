@@ -19,6 +19,13 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const questionId = url.searchParams.get('questionId');
 
+  if (questionId !== null) {
+    const qId = parseInt(questionId, 10);
+    if (isNaN(qId) || qId < 0 || qId > 7) {
+      return new Response('Invalid questionId', { status: 400 });
+    }
+  }
+
   // Normalize cache key (only keep questionId if present)
   const cacheUrl = new URL(url.origin + url.pathname);
   if (questionId !== null) {
@@ -35,17 +42,21 @@ export async function onRequest(context) {
   }
 
   try {
-    await ensureAnswerCountsReady(env.DB);
-
+    let results = [];
     if (questionId !== null) {
       const qId = parseInt(questionId, 10);
-      if (isNaN(qId) || qId < 0 || qId > 7) {
-        return new Response('Invalid questionId', { status: 400 });
+      try {
+        const res = await env.DB.prepare(
+          'SELECT choice_index, count FROM answer_counts WHERE question_id = ? ORDER BY choice_index'
+        ).bind(qId).all();
+        results = res.results || [];
+      } catch (tableErr) {
+        await initAnswerCounts(env.DB);
+        const res = await env.DB.prepare(
+          'SELECT choice_index, count FROM answer_counts WHERE question_id = ? ORDER BY choice_index'
+        ).bind(qId).all();
+        results = res.results || [];
       }
-
-      const { results } = await env.DB.prepare(
-        'SELECT choice_index, count FROM answer_counts WHERE question_id = ? ORDER BY choice_index'
-      ).bind(qId).all();
 
       const stats = {};
       for (const row of results) {
@@ -59,7 +70,8 @@ export async function onRequest(context) {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'public, max-age=120, s-maxage=300, stale-while-revalidate=600'
+          'Cache-Control': 'public, max-age=120, s-maxage=300, stale-while-revalidate=600',
+          'X-Stats-Source': 'd1-summary'
         }
       });
 
@@ -68,9 +80,26 @@ export async function onRequest(context) {
       }
       return response;
     } else {
-      const { results } = await env.DB.prepare(
-        'SELECT question_id, choice_index, count FROM answer_counts ORDER BY question_id, choice_index'
-      ).all();
+      try {
+        const res = await env.DB.prepare(
+          'SELECT question_id, choice_index, count FROM answer_counts ORDER BY question_id, choice_index'
+        ).all();
+        results = res.results || [];
+      } catch (tableErr) {
+        await initAnswerCounts(env.DB);
+        const res = await env.DB.prepare(
+          'SELECT question_id, choice_index, count FROM answer_counts ORDER BY question_id, choice_index'
+        ).all();
+        results = res.results || [];
+      }
+
+      if (results.length === 0) {
+        await initAnswerCounts(env.DB);
+        const res = await env.DB.prepare(
+          'SELECT question_id, choice_index, count FROM answer_counts ORDER BY question_id, choice_index'
+        ).all();
+        results = res.results || [];
+      }
 
       const stats = {};
       for (const row of results) {
@@ -84,7 +113,8 @@ export async function onRequest(context) {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'public, max-age=120, s-maxage=300, stale-while-revalidate=600'
+          'Cache-Control': 'public, max-age=120, s-maxage=300, stale-while-revalidate=600',
+          'X-Stats-Source': 'd1-summary'
         }
       });
 
@@ -95,33 +125,40 @@ export async function onRequest(context) {
     }
 
   } catch (err) {
-    return new Response(`Error: ${err.message}`, { status: 500 });
+    // Graceful fallback if D1 daily cap is exceeded
+    const fallbackBody = questionId !== null
+      ? { questionId: parseInt(questionId, 10), choices: {} }
+      : {};
+    const fallbackResponse = new Response(JSON.stringify(fallbackBody), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=60, s-maxage=120',
+        'X-Stats-Source': 'static-fallback'
+      }
+    });
+
+    if (cache && context.waitUntil) {
+      context.waitUntil(cache.put(cacheKey, fallbackResponse.clone()));
+    }
+    return fallbackResponse;
   }
 }
 
-async function ensureAnswerCountsReady(db) {
-  try {
-    const { results } = await db.prepare('SELECT 1 FROM answer_counts LIMIT 1').all();
-    if (results && results.length > 0) return;
-  } catch (e) {
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS answer_counts (
-        question_id INTEGER NOT NULL,
-        choice_index INTEGER NOT NULL,
-        count INTEGER NOT NULL DEFAULT 0,
-        PRIMARY KEY (question_id, choice_index)
-      )
-    `).run();
-  }
+async function initAnswerCounts(db) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS answer_counts (
+      question_id INTEGER NOT NULL,
+      choice_index INTEGER NOT NULL,
+      count INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (question_id, choice_index)
+    )
+  `).run();
 
-  try {
-    await db.prepare(`
-      INSERT OR REPLACE INTO answer_counts (question_id, choice_index, count)
-      SELECT question_id, choice_index, COUNT(*) as count
-      FROM answers
-      GROUP BY question_id, choice_index
-    `).run();
-  } catch (e) {
-    // Ignore if answers table is empty or D1 cap reached
-  }
+  await db.prepare(`
+    INSERT OR REPLACE INTO answer_counts (question_id, choice_index, count)
+    SELECT question_id, choice_index, COUNT(*) as count
+    FROM answers
+    GROUP BY question_id, choice_index
+  `).run();
 }

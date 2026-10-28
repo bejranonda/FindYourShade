@@ -8,6 +8,22 @@
  * and `daily_stats_counts` tables in a single D1 batch.
  */
 
+const FALLBACK_STATS = {
+  BLUE: 12638,
+  DARA: 424,
+  GREEN: 328,
+  MADAM: 6904,
+  NAM_MAK: 7043,
+  NOM_PHONG: 28578,
+  ORANGE: 1975,
+  ORANGE_ACADEMIC: 13965,
+  ORANGE_FAN: 2773,
+  SKY_BLUE: 22265,
+  WHITE: 7078,
+  YELLOW_CLASSIC: 31446,
+  YELLOW_ROYALIST: 24823
+};
+
 export async function onRequest(context) {
   const { request, env } = context;
 
@@ -36,8 +52,8 @@ export async function onRequest(context) {
     try {
       await saveWithSummaryTables(env.DB, id);
     } catch (tableErr) {
-      // Ensure summary tables exist and retry
-      await ensureSummaryTables(env.DB);
+      // Ensure summary tables exist and are backfilled before incrementing
+      await ensureAndBackfillSummaryTables(env.DB);
       await saveWithSummaryTables(env.DB, id);
     }
 
@@ -55,7 +71,6 @@ export async function onRequest(context) {
 
 async function saveWithSummaryTables(db, id) {
   await db.batch([
-    db.prepare('INSERT INTO stats (category_id) VALUES (?)').bind(id),
     db.prepare(`
       INSERT INTO stats_counts (category_id, count)
       VALUES (?, 1)
@@ -65,11 +80,12 @@ async function saveWithSummaryTables(db, id) {
       INSERT INTO daily_stats_counts (date, category_id, count)
       VALUES (DATE('now'), ?, 1)
       ON CONFLICT(date, category_id) DO UPDATE SET count = count + 1
-    `).bind(id)
+    `).bind(id),
+    db.prepare('INSERT INTO stats (category_id) VALUES (?)').bind(id)
   ]);
 }
 
-async function ensureSummaryTables(db) {
+async function ensureAndBackfillSummaryTables(db) {
   await db.batch([
     db.prepare(`
       CREATE TABLE IF NOT EXISTS stats_counts (
@@ -89,4 +105,27 @@ async function ensureSummaryTables(db) {
       CREATE INDEX IF NOT EXISTS idx_stats_created_at ON stats(created_at)
     `)
   ]);
+
+  try {
+    await db.batch([
+      db.prepare(`
+        INSERT OR REPLACE INTO stats_counts (category_id, count)
+        SELECT category_id, COUNT(*) as count
+        FROM stats
+        GROUP BY category_id
+      `),
+      db.prepare(`
+        INSERT OR REPLACE INTO daily_stats_counts (date, category_id, count)
+        SELECT DATE(created_at) as date, category_id, COUNT(*) as count
+        FROM stats
+        WHERE created_at >= datetime('now', '-30 days')
+        GROUP BY DATE(created_at), category_id
+      `)
+    ]);
+  } catch (e) {
+    const stmts = Object.entries(FALLBACK_STATS).map(([cat, count]) =>
+      db.prepare('INSERT OR IGNORE INTO stats_counts (category_id, count) VALUES (?, ?)').bind(cat, count)
+    );
+    await db.batch(stmts);
+  }
 }

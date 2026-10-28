@@ -61,8 +61,8 @@ export async function onRequest(context) {
       results = res.results || [];
     }
 
-    // If table existed but was empty, backfill once
-    if (results.length === 0) {
+    // If table existed but was not fully backfilled (< 13 categories), backfill once
+    if (results.length < 13) {
       await initStatsCounts(env.DB);
       const res = await env.DB.prepare(
         'SELECT category_id, count FROM stats_counts'
@@ -93,7 +93,7 @@ export async function onRequest(context) {
 
   } catch (err) {
     // Graceful fallback if D1 daily cap is exceeded
-    return new Response(JSON.stringify(FALLBACK_STATS), {
+    const fallbackResponse = new Response(JSON.stringify(FALLBACK_STATS), {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -101,6 +101,12 @@ export async function onRequest(context) {
         'X-Stats-Source': 'static-fallback'
       }
     });
+
+    if (cache && context.waitUntil) {
+      context.waitUntil(cache.put(cacheKey, fallbackResponse.clone()));
+    }
+
+    return fallbackResponse;
   }
 }
 
