@@ -105,7 +105,7 @@ const translations = {
         backHome: "กลับหน้าหลัก",
         share: "แชร์ผลลัพธ์",
         screenshot: "บันทึกรูปผลลัพธ์",
-        footerRelease: "Release: v4.0.1",
+        footerRelease: "Release: v4.0.2",
         footerSequel: "ภาคต่อของ Sim Thailand 2569"
     },
     en: {
@@ -139,7 +139,7 @@ const translations = {
         backHome: "Back to Home",
         share: "Share Result",
         screenshot: "Save Result Image",
-        footerRelease: "Release: v4.0.1",
+        footerRelease: "Release: v4.0.2",
         footerSequel: "Sequel to Sim Thailand 2569"
     }
 };
@@ -505,8 +505,35 @@ calculateMaxPossibleScores();
 // Database (Cloudflare D1)
 // ============================================
 
+// Baseline snapshot fallback if D1 daily cap is temporarily reached
+const FALLBACK_GLOBAL_STATS = {
+    BLUE: 12638, DARA: 424, GREEN: 328, MADAM: 6904, NAM_MAK: 7043,
+    NOM_PHONG: 28578, ORANGE: 1975, ORANGE_ACADEMIC: 13965, ORANGE_FAN: 2773,
+    SKY_BLUE: 22265, WHITE: 7078, YELLOW_CLASSIC: 31446, YELLOW_ROYALIST: 24823
+};
+
+// In-memory session cache to avoid redundant D1 reads
+let cachedGlobalStats = null;
+let cachedGlobalStatsAt = 0;
+let cachedDailyStats = null;
+let cachedDailyStatsAt = 0;
+const STATS_CACHE_TTL_MS = 60 * 1000; // 60 seconds
+
+function mergeWithLocalStats(baseStats) {
+    const localStats = JSON.parse(localStorage.getItem('globalStats') || '{}');
+    const merged = { ...baseStats };
+    for (const [k, v] of Object.entries(localStats)) {
+        merged[k] = (merged[k] || 0) + v;
+    }
+    return merged;
+}
+
 async function saveResultToDatabase(category) {
     console.log("Saving result to Cloudflare:", category.id);
+    // Optimistically update in-memory cache so UI reflects new result without cache-busting D1
+    if (cachedGlobalStats) {
+        cachedGlobalStats[category.id] = (cachedGlobalStats[category.id] || 0) + 1;
+    }
     try {
         // Save to D1 database via Pages Function
         const response = await fetch('/api/save', {
@@ -580,31 +607,39 @@ async function getAnswerStats(questionId = null) {
 }
 
 async function getGlobalStats() {
+    if (cachedGlobalStats && (Date.now() - cachedGlobalStatsAt) < STATS_CACHE_TTL_MS) {
+        return mergeWithLocalStats(cachedGlobalStats);
+    }
     try {
-        // Get stats from D1 database via Pages Function with cache-busting
-        const response = await fetch(`/api/stats?t=${Date.now()}`);
+        // Get stats from D1 summary table via Cloudflare CDN cache (no ?t= cache-busting)
+        const response = await fetch('/api/stats');
         if (response.ok) {
             const stats = await response.json();
-            // Merge with localStorage for any unsaved local results
-            const localStats = JSON.parse(localStorage.getItem('globalStats') || '{}');
-            return { ...stats, ...localStats };
+            cachedGlobalStats = stats;
+            cachedGlobalStatsAt = Date.now();
+            return mergeWithLocalStats(stats);
         } else {
-            // Fallback to localStorage if API fails
-            return JSON.parse(localStorage.getItem('globalStats') || '{}');
+            return mergeWithLocalStats(FALLBACK_GLOBAL_STATS);
         }
     } catch (e) {
         console.error("Failed to fetch stats", e);
-        // Fallback to localStorage on error
-        return JSON.parse(localStorage.getItem('globalStats') || '{}');
+        return mergeWithLocalStats(FALLBACK_GLOBAL_STATS);
     }
 }
 
 // Get daily stats from API
 async function getDailyStats() {
+    if (cachedDailyStats && (Date.now() - cachedDailyStatsAt) < STATS_CACHE_TTL_MS) {
+        return cachedDailyStats;
+    }
     try {
-        const response = await fetch(`/api/daily-stats?t=${Date.now()}`);
+        // Use Cloudflare CDN cache (no ?t= cache-busting)
+        const response = await fetch('/api/daily-stats');
         if (response.ok) {
-            return await response.json();
+            const data = await response.json();
+            cachedDailyStats = data;
+            cachedDailyStatsAt = Date.now();
+            return data;
         }
         return { dailyData: [], anomalies: [], summary: { totalDays: 0, avgPerDay: 0, stdDev: 0, maxInDay: 0, minInDay: 0 } };
     } catch (e) {

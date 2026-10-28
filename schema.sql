@@ -1,8 +1,8 @@
 -- ============================================
 -- FindYourShade - Cloudflare D1 Database Schema
 -- ============================================
--- This schema creates the stats table for storing
--- quiz results globally across all users.
+-- This schema creates the stats and summary tables for storing
+-- quiz results globally across all users with minimal rows_read.
 --
 -- Usage:
 --   wrangler d1 execute DB --remote --file=schema.sql
@@ -17,12 +17,44 @@ CREATE TABLE IF NOT EXISTS stats (
 );
 
 -- Index for faster aggregation queries
--- Used by GET /api/stats endpoint
 CREATE INDEX IF NOT EXISTS idx_category_id ON stats(category_id);
 
+-- Index for date-range queries (e.g., last 30 days)
+CREATE INDEX IF NOT EXISTS idx_stats_created_at ON stats(created_at);
+
 -- ============================================
--- Answers table: stores individual answer choices per question
--- Each row represents one answer from one quiz session
+-- Pre-Aggregated Summary Tables (Low rows_read)
+-- ============================================
+-- These tables keep running totals so GET endpoints read ~13-80 rows
+-- instead of scanning 160,000+ rows in `stats` or 1,000,000+ rows in `answers`.
+
+-- Global category counts (max 13 rows)
+-- Used by GET /api/stats
+CREATE TABLE IF NOT EXISTS stats_counts (
+    category_id TEXT PRIMARY KEY,
+    count INTEGER NOT NULL DEFAULT 0
+);
+
+-- Daily category counts (1 row per date + category)
+-- Used by GET /api/daily-stats
+CREATE TABLE IF NOT EXISTS daily_stats_counts (
+    date TEXT NOT NULL,
+    category_id TEXT NOT NULL,
+    count INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (date, category_id)
+);
+
+-- Pre-aggregated answer counts per question and choice (max 80 rows)
+-- Used by GET /api/answers
+CREATE TABLE IF NOT EXISTS answer_counts (
+    question_id INTEGER NOT NULL,
+    choice_index INTEGER NOT NULL,
+    count INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (question_id, choice_index)
+);
+
+-- ============================================
+-- Answers table (Legacy raw log)
 -- ============================================
 CREATE TABLE IF NOT EXISTS answers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,24 +73,17 @@ CREATE INDEX IF NOT EXISTS idx_question_choice ON answers(question_id, choice_in
 -- ============================================
 -- Valid category_id values:
 -- ============================================
--- NAM_MAK       - แดงน้ำหมาก (Traditionalist Red)
--- NOM_PHONG     - แดงนมผง (New Gen Red)
--- MADAM         - แดงมาดาม (Sophisticated Red)
--- DARA          - แดงดารา (Celebrity Red)
--- ORANGE        - ส้ม (Orange - Legacy)
+-- NAM_MAK         - แดงน้ำหมาก (Traditionalist Red)
+-- NOM_PHONG       - แดงนมผง (New Gen Red)
+-- MADAM           - แดงมาดาม (Sophisticated Red)
+-- DARA            - แดงดารา (Celebrity Red)
+-- ORANGE          - ส้ม (Orange - Legacy)
 -- ORANGE_ACADEMIC - ส้มวิชาการ (Academic Orange)
--- ORANGE_FAN    - ส้มแบก (Fandom Orange)
--- BLUE          - น้ำเงิน (Blue)
--- SKY_BLUE      - ฟ้า (Sky Blue)
--- YELLOW_CLASSIC - เหลืองคลาสสิก (Classic Yellow)
+-- ORANGE_FAN      - ส้มแบก (Fandom Orange)
+-- BLUE            - น้ำเงิน (Blue)
+-- SKY_BLUE        - ฟ้า (Sky Blue)
+-- YELLOW_CLASSIC  - เหลืองคลาสสิก (Classic Yellow)
 -- YELLOW_ROYALIST - เหลืองสถาบัน (Royalist)
--- GREEN         - เขียว (Green)
--- WHITE         - ขาว (Silent White)
+-- GREEN           - เขียว (Green)
+-- WHITE           - ขาว (Silent White)
 -- ============================================
-
--- Optional: Initialize with sample data for testing
--- Uncomment the lines below to seed the database
--- INSERT INTO stats (category_id) VALUES ('WHITE');
--- INSERT INTO stats (category_id) VALUES ('BLUE');
--- INSERT INTO stats (category_id) VALUES ('NAM_MAK');
--- INSERT INTO stats (category_id) VALUES ('ORANGE');

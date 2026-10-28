@@ -3,7 +3,7 @@
  * Endpoint: /api/clear-answers
  * Method: POST
  *
- * This endpoint clears the answers table to remove stale data
+ * This endpoint clears the answer_counts and answers tables to remove stale data
  * after quiz question changes. It does NOT affect the stats table.
  *
  * Usage:
@@ -33,32 +33,23 @@ export async function onRequest(context) {
       });
     }
 
-    // Count existing records before deletion
-    const { results: countBefore } = await env.DB.prepare(
-      'SELECT COUNT(*) as count FROM answers'
-    ).all();
-
-    const count = countBefore[0]?.count || 0;
-
-    // Delete all records from answers table
-    const result = await env.DB.prepare(
-      'DELETE FROM answers'
-    ).run();
-
-    if (result.success) {
-      return new Response(JSON.stringify({
-        success: true,
-        message: 'Answers table cleared successfully',
-        deletedRecords: count
-      }), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        }
-      });
-    } else {
-      return new Response('Failed to clear answers', { status: 500 });
+    // Delete records from both summary and raw answers tables without full-table COUNT(*)
+    await env.DB.prepare('DELETE FROM answers').run();
+    try {
+      await env.DB.prepare('DELETE FROM answer_counts').run();
+    } catch (e) {
+      // Ignore if answer_counts does not exist yet
     }
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Answers tables cleared successfully'
+    }), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
 
   } catch (err) {
     return new Response(`Error: ${err.message}`, { status: 500 });
